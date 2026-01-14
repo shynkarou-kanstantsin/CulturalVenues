@@ -67,7 +67,18 @@
 
 	<ItemGroup>
 	  <Folder Include="Services\" />
-	  <Folder Include="Views\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\Controls\RecommendationTab.xaml.cs">
+	    <DependentUpon>RecommendationTab.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\Controls\RecommendationTab.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
