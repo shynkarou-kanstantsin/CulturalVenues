@@ -6,6 +6,7 @@
         public MainPage()
         {
             InitializeComponent();
+            BindingContext = new ViewModels.MainViewModel();
         }
     }
 }
