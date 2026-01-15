@@ -4,20 +4,35 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CulturalVenues.MainPage">
 
-    <CollectionView
-        ItemsSource="{Binding Events}"
-        ItemSizingStrategy="MeasureFirstItem"
-        Margin="10">
+    <Grid>
 
-        <CollectionView.ItemsLayout>
-            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
-        </CollectionView.ItemsLayout>
-        
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <controls:RecommendationTab/>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60*"/>
+            <RowDefinition Height="40*"/>
+        </Grid.RowDefinitions>
 
+        <Grid Grid.Row="0">
+            <ContentView>
+                <controls:MapView/>
+            </ContentView>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <CollectionView
+            ItemsSource="{Binding Events}"
+            ItemSizingStrategy="MeasureFirstItem"
+            Margin="10">
+
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <controls:RecommendationTab/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
 </ContentPage>
