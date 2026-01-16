@@ -10,13 +10,15 @@
             <RowDefinition Height="60*"/>
             <RowDefinition Height="40*"/>
         </Grid.RowDefinitions>
-
+        
+        <!--
         <Grid Grid.Row="0">
             <ContentView>
                 <controls:MapView/>
             </ContentView>
         </Grid>
-
+        -->
+        
         <Grid Grid.Row="1">
             <CollectionView
             ItemsSource="{Binding Events}"
