@@ -18,6 +18,12 @@
             </ContentView>
         </Grid>
         -->
+
+        <Grid Grid.Row="0">
+            <ContentView>
+                <controls:SearchBar/>
+            </ContentView>
+        </Grid>
         
         <Grid Grid.Row="1">
             <CollectionView

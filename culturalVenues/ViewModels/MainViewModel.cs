@@ -121,7 +121,5 @@ namespace CulturalVenues.ViewModels
                 }
             };
         }
-            
-
     }
 }
