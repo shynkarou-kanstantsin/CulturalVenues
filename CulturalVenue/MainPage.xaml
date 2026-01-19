@@ -2,22 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:CulturalVenue.Views.Controls"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              x:Class="CulturalVenue.MainPage">
 
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="60*"/>
-            <RowDefinition Height="40*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="50*"/>
+            <RowDefinition Height="30*"/>
         </Grid.RowDefinitions>
-
-        <!--
-    <Grid Grid.Row="0">
-        <ContentView>
-            <controls:MapView/>
-        </ContentView>
-    </Grid>
-    -->
 
         <Grid Grid.Row="0">
             <ContentView>
@@ -26,6 +20,10 @@
         </Grid>
 
         <Grid Grid.Row="1">
+            <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}"/>
+        </Grid>
+
+        <Grid Grid.Row="2">
             <CollectionView
         ItemsSource="{Binding Events}"
         ItemSizingStrategy="MeasureFirstItem"
@@ -43,5 +41,4 @@
             </CollectionView>
         </Grid>
     </Grid>
-
 </ContentPage>

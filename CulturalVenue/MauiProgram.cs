@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 #if ANDROID
 using Android.Widget;
@@ -19,6 +20,7 @@ namespace CulturalVenue
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseSkiaSharp()
                 //.UseMauiMaps()
                 .ConfigureFonts(fonts =>
                 {

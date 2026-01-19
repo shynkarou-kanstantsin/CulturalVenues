@@ -2,16 +2,24 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using Mapsui;
+using Mapsui.Tiling;
+using Mapsui.Projections;
+
 
 namespace CulturalVenue.ViewModels
 {
-    internal class MainViewModel : ObservableObject
+    internal partial class MainViewModel : ObservableObject
     {
-        public ObservableCollection<Event> Events { get; set; }
+        [ObservableProperty]
+        private Mapsui.Map map;
 
+        public ObservableCollection<Event> Events { get; set; }
 
         public MainViewModel()
         {
+            InitializeMap();
+            
             Events = new ObservableCollection<Event>
             {
                 new Event
@@ -120,6 +128,14 @@ namespace CulturalVenue.ViewModels
                     }
                 }
             };
+        }
+
+        public void InitializeMap()
+        {
+            var map = new Mapsui.Map();
+            map.Layers.Add(OpenStreetMap.CreateTileLayer());
+            this.Map = map;
+
         }
     }
 }
