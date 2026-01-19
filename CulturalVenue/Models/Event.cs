@@ -2,13 +2,14 @@
 {
     internal class Event
     {
-        private string? currency;
-        public string Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Title { get; set; }
         public string? Description { get; set; }
         public DateTime Date { get; set; }
         public TimeSpan TimeStart { get; set; }
         public decimal? StartingPrice { get; set; }
+        private string? currency;
+
         public string? Currency 
         { 
             get => currency;

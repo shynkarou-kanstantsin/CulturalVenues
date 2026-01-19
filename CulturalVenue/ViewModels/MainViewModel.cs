@@ -24,7 +24,6 @@ namespace CulturalVenue.ViewModels
             {
                 new Event
                 {
-                    Id = "1",
                     Title = "Art Exhibition",
                     Description = "An exhibition showcasing local artists.",
                     Date = new DateTime(2024, 7, 15),
@@ -35,7 +34,6 @@ namespace CulturalVenue.ViewModels
                     Type = "Exhibition",
                     Venue = new Venue
                     {
-                        Id = "V1",
                         Name = "City Art Gallery",
                         Latitude = 40.7128,
                         Longitude = -74.0060,
@@ -45,7 +43,6 @@ namespace CulturalVenue.ViewModels
                 },
                 new Event
                 {
-                    Id = "2",
                     Title = "Classical Music Concert",
                     Description = "An evening of classical music performances.",
                     Date = new DateTime(2024, 8, 20),
@@ -56,7 +53,6 @@ namespace CulturalVenue.ViewModels
                     Type = "Concert",
                     Venue = new Venue
                     {
-                        Id = "V2",
                         Name = "Grand Concert Hall",
                         Latitude = 34.0522,
                         Longitude = -118.2437,
@@ -66,7 +62,6 @@ namespace CulturalVenue.ViewModels
                 },
                 new Event
                 {
-                    Id = "3",
                     Title = "Theater Play",
                     Description = "A captivating drama performed by local actors.",
                     Date = new DateTime(2024, 9, 10),
@@ -77,7 +72,6 @@ namespace CulturalVenue.ViewModels
                     Type = "Theater",
                     Venue = new Venue
                     {
-                        Id = "V3",
                         Name = "Downtown Theater",
                         Latitude = 41.8781,
                         Longitude = -87.6298,
@@ -87,7 +81,6 @@ namespace CulturalVenue.ViewModels
                 },
                 new Event
                 {
-                    Id = "4",
                     Title = "Jazz Night",
                     Description = "A night of smooth jazz performances.",
                     Date = new DateTime(2024, 10, 5),
@@ -98,7 +91,6 @@ namespace CulturalVenue.ViewModels
                     Type = "Concert",
                     Venue = new Venue
                     {
-                        Id = "V4",
                         Name = "Jazz Club",
                         Latitude = 29.7604,
                         Longitude = -95.3698,
@@ -108,7 +100,6 @@ namespace CulturalVenue.ViewModels
                 },
                 new Event
                 {
-                    Id = "5",
                     Title = "Modern Dance Performance",
                     Description = "A contemporary dance show by a renowned troupe.",
                     Date = new DateTime(2024, 11, 12),
@@ -119,7 +110,6 @@ namespace CulturalVenue.ViewModels
                     Type = "Dance",
                     Venue = new Venue
                     {
-                        Id = "V5",
                         Name = "City Dance Theater",
                         Latitude = 33.4484,
                         Longitude = -112.0740,
