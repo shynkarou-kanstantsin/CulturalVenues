@@ -2,9 +2,9 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CulturalVenue.Views.Controls.RecommendationTab">
-    
-    <VerticalStackLayout>
-        <Border HeightRequest="120" WidthRequest="120" StrokeThickness="0"
+
+    <VerticalStackLayout WidthRequest="150" HeightRequest="210">
+        <Border HeightRequest="120" WidthRequest="150" StrokeThickness="0"
             StrokeShape="RoundRectangle 20">
             <Grid>
                 <Image Source="{Binding PhotoUrl[0]}" 
@@ -22,14 +22,23 @@
         
         <Label 
             Text="{Binding Title}"
+            FontAttributes="Bold"
             VerticalOptions="Center" 
-            HorizontalOptions="Start" />
-        <Label 
-            Text="{Binding Date, StringFormat='{0:dd MMMM yyyy}'}"
-            VerticalOptions="Center" 
-            HorizontalOptions="Start" />
+            HorizontalOptions="Start"
+            Margin="0,7,0,0"/>
+        
+        <HorizontalStackLayout>
+            <Image Source="calendar.png" HeightRequest="20"/>
+
+            <Label 
+                Text="{Binding Date, StringFormat='{0:dd.MM.yyyy}'}"
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
+        </HorizontalStackLayout>
+        
         <HorizontalStackLayout
             HorizontalOptions="Start">
+            <Image Source="schedule.png" HeightRequest="20"/>
             <Label 
                 Text="{Binding TimeStart, StringFormat='{0:hh\\:mm}'}"
                 VerticalOptions="Center"/>

@@ -10,7 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="10*"/>
             <RowDefinition Height="50*"/>
-            <RowDefinition Height="30*"/>
+            <RowDefinition Height="35*"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -24,21 +24,27 @@
         </Grid>
 
         <Grid Grid.Row="2">
-            <CollectionView
-        ItemsSource="{Binding Events}"
-        ItemSizingStrategy="MeasureFirstItem"
-        Margin="10">
+            <VerticalStackLayout>
 
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
-                </CollectionView.ItemsLayout>
+                <Label Text="Events nearby" Margin="20,10,0,0" FontAttributes="Bold" FontSize="18"/>
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <controls:RecommendationTab/>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                <CollectionView
+                    ItemsSource="{Binding Events}"
+                    Footer="{x:Null}"
+                    ItemSizingStrategy="MeasureFirstItem"
+                    Margin="5,10,0,0">
+
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <controls:RecommendationTab/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
         </Grid>
     </Grid>
 </ContentPage>
