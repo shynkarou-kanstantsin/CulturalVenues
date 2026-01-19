@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CulturalVenue.Views.Controls.RecommendationTab">
+    
+    <VerticalStackLayout>
+        <Border HeightRequest="120" WidthRequest="120" StrokeThickness="0"
+            StrokeShape="RoundRectangle 20">
+            <Grid>
+                <Image Source="{Binding PhotoUrl[0]}" 
+                Aspect="AspectFill" HorizontalOptions="CenterAndExpand"/>
+
+                <Border HeightRequest="25" WidthRequest="40" StrokeThickness="0" StrokeShape="RoundRectangle 10" 
+                        BackgroundColor="Orange" VerticalOptions="Start" HorizontalOptions="End" Margin="0,7,7,0">
+                    <HorizontalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Currency}" VerticalOptions="Center" TextColor="White" FontSize="12"/>
+                        <Label Text="{Binding StartingPrice}" VerticalOptions="Center" TextColor="White" FontSize="12"/>
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
+        </Border>
+        
+        <Label 
+            Text="{Binding Title}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" />
+        <Label 
+            Text="{Binding Date, StringFormat='{0:dd MMMM yyyy}'}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" />
+        <HorizontalStackLayout
+            HorizontalOptions="Start">
+            <Label 
+                Text="{Binding TimeStart, StringFormat='{0:hh\\:mm}'}"
+                VerticalOptions="Center"/>
+            <Label 
+                Text=" • "
+                VerticalOptions="Center"/>
+            <Label 
+                Text="{Binding Type}"
+                VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentView>
