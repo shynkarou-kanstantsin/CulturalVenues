@@ -9,14 +9,20 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="10*"/>
-            <RowDefinition Height="50*"/>
+            <RowDefinition Height="55*"/>
             <RowDefinition Height="35*"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            <ContentView>
-                <controls:SearchBar/>
-            </ContentView>
+            <HorizontalStackLayout Padding="10">
+                <ContentView>
+                    <controls:SearchBar/>
+                </ContentView>
+
+                <Border StrokeShape="RoundRectangle 35" WidthRequest="35" HeightRequest="35" Margin="7">
+                    <Image Source="person.png"/>
+                </Border>
+            </HorizontalStackLayout>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -26,13 +32,13 @@
         <Grid Grid.Row="2">
             <VerticalStackLayout>
 
-                <Label Text="Events nearby" Margin="20,10,0,0" FontAttributes="Bold" FontSize="18"/>
+                <Label Text="Events nearby" Margin="10,10,0,0" FontAttributes="Bold" FontSize="18"/>
 
                 <CollectionView
                     ItemsSource="{Binding Events}"
                     Footer="{x:Null}"
                     ItemSizingStrategy="MeasureFirstItem"
-                    Margin="5,10,0,0">
+                    Margin="10,10,0,0">
 
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
