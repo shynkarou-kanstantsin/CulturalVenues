@@ -20,7 +20,7 @@
                     <controls:SearchBar/>
                 </ContentView>
 
-                <Border StrokeShape="RoundRectangle 35" WidthRequest="35" HeightRequest="35" Margin="7">
+                <Border StrokeShape="RoundRectangle 35" StrokeThickness="1.5" Stroke="Black" WidthRequest="35" HeightRequest="35" Margin="7">
                     <Image Source="person.png"/>
                 </Border>
             </HorizontalStackLayout>
@@ -43,7 +43,7 @@
                     ItemsSource="{Binding Events}"
                     Footer="{x:Null}"
                     ItemSizingStrategy="MeasureFirstItem"
-                    Margin="10,10,0,0">
+                    Margin="10,10,10,0">
 
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>

@@ -4,12 +4,27 @@ using Mapsui.Projections;
 using Mapsui.UI.Maui;
 using System.Collections;
 using System.Collections.Specialized;
+using Mapsui.Styles;
 
 namespace CulturalVenue.Behaviors
 {
     class MapPinsBehavior : Behavior<MapControl>
     {
-        //private int _bitmapId = -1;
+        private Mapsui.Styles.Image? _pinImage;
+        
+        private static readonly Mapsui.Styles.Color MusicColor = Mapsui.Styles.Color.FromString("#FFD54F");
+        private static readonly Mapsui.Styles.Color FilmColor = Mapsui.Styles.Color.FromString("#FF8A65");
+        private static readonly Mapsui.Styles.Color SportColor = Mapsui.Styles.Color.FromString("#64B5F6");
+        private static readonly Mapsui.Styles.Color ArtColor = Mapsui.Styles.Color.FromString("#81C784");
+
+        private readonly Dictionary<string, Mapsui.Styles.SymbolStyle> _pinStyles = new()
+        {
+            { "Music", CreateRoundStyle(MusicColor) },
+            { "Film", CreateRoundStyle(FilmColor) },
+            { "Sports", CreateRoundStyle(SportColor) },
+            { "Arts & Theater", CreateRoundStyle(ArtColor) }
+        };
+
 
         public static readonly BindableProperty ItemSourceProperty =
             BindableProperty.Create(
@@ -105,13 +120,11 @@ namespace CulturalVenue.Behaviors
 
         private void RefreshPins()
         {
-            // Оставляем базовые проверки
             if (_mapControl?.Map is null || _pinsLayer is null)
                 return;
 
             var features = new List<IFeature>();
 
-            // Добавляем реальные данные, если они есть
             if (ItemSource != null)
             {
                 foreach (var item in ItemSource)
@@ -120,33 +133,45 @@ namespace CulturalVenue.Behaviors
                     {
                         var point = SphericalMercator.FromLonLat(evnt.Venue.Longitude, evnt.Venue.Latitude);
                         var feature = new PointFeature(point);
-                        feature.Styles.Add(new Mapsui.Styles.SymbolStyle { SymbolScale = 0.5, Fill = new Mapsui.Styles.Brush(Mapsui.Styles.Color.Red) });
+                        if (_pinStyles.TryGetValue(evnt.Type, out var style))
+                        {
+                            feature.Styles.Add(style);
+                        }
+                        else
+                        {
+                            feature.Styles.Add(CreateRoundStyle(Mapsui.Styles.Color.Gray));
+                        }
+
                         features.Add(feature);
                     }
                 }
             }
 
             _pinsLayer.Features = features;
-
             _pinsLayer.DataHasChanged();
             _mapControl.RefreshData();
         }
 
+        private static Mapsui.Styles.SymbolStyle CreateRoundStyle(Mapsui.Styles.Color color)
+        {
+            return new Mapsui.Styles.SymbolStyle
+            {
+                SymbolType = Mapsui.Styles.SymbolType.Ellipse,
+                Fill = new Mapsui.Styles.Brush(color),
+                SymbolScale = 0.9
+            };
+        }
         /*
         private void RegisterIcon()
         {
-            if (_bitmapId != -1)
-                return;
-
-            var resourceName = "CulturalVenue.Resources.Image.search.png";
-            var assembly = typeof(MapPinsBehavior).Assembly;
-
-            using var stream = assembly.GetManifestResourceStream(resourceName);
-            if (stream is not null)
+            if (_pinImage is null)
             {
-                _bitmapId = BitmapRegistry.Instance.Register(stream);
-                _bitmapId = Mapsui.Styles.BitmapRegistry.Instance.Register(stream);
-                _bitmapId = Mapsui.UI.BitmapRegistry.Instance.Register(stream);
+                var assembly = typeof(MapPinsBehavior).Assembly;
+                using var stream = assembly.GetManifestResourceStream("CulturalVenue.Resources.search.png");
+                if (stream is not null)
+                {
+                    _pinImage = new Mapsui.Styles.Image(stream);
+                }
             }
         }
         */

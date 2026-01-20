@@ -31,7 +31,7 @@ namespace CulturalVenue.ViewModels
                     StartingPrice = 10,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://248006.selcdn.ru/main/iblock/344/3442c5677ef3477de3c980080d907a54/550be50fffb2d4448f55696361453d59.jpg" },
-                    Type = "Exhibition",
+                    Type = "Arts & Theater",
                     Venue = new Venue
                     {
                         Name = "City Art Gallery",
@@ -50,7 +50,7 @@ namespace CulturalVenue.ViewModels
                     StartingPrice = 25,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://img03.rl0.ru/afisha/e1200x630p478x500f2452x1401q85iw10cc/s5.afisha.ru/mediastorage/19/5a/28369821ab41424f89fdbddd5a19.jpg" },
-                    Type = "Concert",
+                    Type = "Music",
                     Venue = new Venue
                     {
                         Name = "Grand Concert Hall",
@@ -69,7 +69,7 @@ namespace CulturalVenue.ViewModels
                     StartingPrice = 15,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://www.maly.ru/images/performances/5a43aa03ea87e.jpg" },
-                    Type = "Theater",
+                    Type = "Arts & Theater",
                     Venue = new Venue
                     {
                         Name = "Downtown Theater",
@@ -88,7 +88,7 @@ namespace CulturalVenue.ViewModels
                     StartingPrice = 20m,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://showcatalog.by/Shutterstock/Jazz-Banner.jpg" },
-                    Type = "Concert",
+                    Type = "Music",
                     Venue = new Venue
                     {
                         Name = "Jazz Club",
@@ -107,7 +107,7 @@ namespace CulturalVenue.ViewModels
                     StartingPrice = 30m,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://godance.tv/sites/default/files/users/1/liteblog/122/084D8CD4-7492-405E-B31D-462E4ADC585A.jpeg" },
-                    Type = "Dance",
+                    Type = "Arts & Theater",
                     Venue = new Venue
                     {
                         Name = "City Dance Theater",
@@ -115,6 +115,44 @@ namespace CulturalVenue.ViewModels
                         Longitude = -112.0740,
                         Address = "654 Dance Blvd, Phoenix, AZ",
                         PhotoUrl = new List<string> { "https://example.com/venue5.jpg" }
+                    }
+                },
+                new Event
+                {
+                    Title = "el Clasico",
+                    Description = "Football match between FC Barcelona and Real Madrid.",
+                    Date = new DateTime(2024, 12, 1),
+                    TimeStart = new TimeSpan(16, 0, 0),
+                    StartingPrice = 50m,
+                    Currency = "USD",
+                    PhotoUrl = new List<string> { "https://thefootballfreak.com/wp-content/uploads/2025/09/el-classico-phrase.jpg" },
+                    Type = "Sports",
+                    Venue = new Venue
+                    {
+                        Name = "National Stadium",
+                        Latitude = 40.4168,
+                        Longitude = -3.7038,
+                        Address = "789 Sports Ave, Madrid, Spain",
+                        PhotoUrl = new List<string> { "https://example.com/venue6.jpg" }
+                    }
+                },
+                new Event
+                {
+                    Title = "The Lord of the rings",
+                    Description = "A fantasy adventure film based on the novel by J.R.R. Tolkien.",
+                    Date = new DateTime(2024, 12, 20),
+                    TimeStart = new TimeSpan(19, 0, 0),
+                    StartingPrice = 12m,
+                    Currency = "USD",
+                    PhotoUrl = new List<string> { "https://static.wikia.nocookie.net/lotr/images/0/0d/The_One_Ring_on_a_map_of_Middle-earth.jpg/revision/latest?cb=20200305221819" },
+                    Type = "Film",
+                    Venue = new Venue
+                    {
+                        Name = "Downtown Cinema",
+                        Latitude = 51.5074,
+                        Longitude = -0.1278,
+                        Address = "123 Movie St, London, UK",
+                        PhotoUrl = new List<string> { "https://example.com/venue7.jpg" }
                     }
                 }
             };
