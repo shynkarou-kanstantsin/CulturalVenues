@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:CulturalVenue.Views.Controls"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             xmlns:behaviors="clr-namespace:CulturalVenue.Behaviors"
              x:Class="CulturalVenue.MainPage">
 
     <Grid>
@@ -14,7 +15,7 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            <HorizontalStackLayout Padding="10">
+            <HorizontalStackLayout Padding="10" HorizontalOptions="Center">
                 <ContentView>
                     <controls:SearchBar/>
                 </ContentView>
@@ -26,7 +27,11 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}"/>
+            <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}">
+                <mapsui:MapControl.Behaviors>
+                    <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"/>
+                </mapsui:MapControl.Behaviors>
+            </mapsui:MapControl>
         </Grid>
 
         <Grid Grid.Row="2">
