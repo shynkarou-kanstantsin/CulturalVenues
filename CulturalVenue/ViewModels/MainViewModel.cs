@@ -14,6 +14,14 @@ namespace CulturalVenue.ViewModels
         [ObservableProperty]
         private Mapsui.Map map;
 
+        public Dictionary<string, ImageSource> ChipFilters { get; } = new()
+        {
+            { "Arts & Theater", "art" },
+            { "Music", "music" },
+            { "Film", "film" },
+            {"Sports", "sport" }
+        };
+
         public ObservableCollection<Event> Events { get; set; }
 
         public MainViewModel()

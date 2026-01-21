@@ -32,11 +32,24 @@
                     <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"/>
                 </mapsui:MapControl.Behaviors>
             </mapsui:MapControl>
+
+            <CollectionView ItemsSource="{Binding ChipFilters}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,10,10,0">
+
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <controls:ChipFilters/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
         </Grid>
 
         <Grid Grid.Row="2">
             <VerticalStackLayout>
-
                 <Label Text="Events nearby" Margin="10,10,0,0" FontAttributes="Bold" FontSize="18"/>
 
                 <CollectionView
