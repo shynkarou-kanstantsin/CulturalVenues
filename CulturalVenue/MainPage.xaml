@@ -29,8 +29,7 @@
         <Grid Grid.Row="1">
             <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}">
                 <mapsui:MapControl.Behaviors>
-                    <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"
-                                               UserLocation="{Binding BindingContext.UserLocation, Source={x:Reference mapControl}}"/>
+                    <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"/>
                 </mapsui:MapControl.Behaviors>
             </mapsui:MapControl>
 
