@@ -4,8 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Mapsui;
 using Mapsui.Tiling;
-using Mapsui.Projections;
-
+using Microsoft.Maui.ApplicationModel;
 
 namespace CulturalVenue.ViewModels
 {
@@ -13,6 +12,47 @@ namespace CulturalVenue.ViewModels
     {
         [ObservableProperty]
         private Mapsui.Map map;
+
+        [ObservableProperty]
+        private Location _userLocation;
+
+        private bool _isListening; 
+
+        public async Task StartLocationUpdates()
+        {
+            if (_isListening)
+                return;
+
+            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+            }
+
+            if (status == PermissionStatus.Granted)
+            {
+                _isListening = true;
+
+                UserLocation = new Location(45.7128, -74.0060);
+
+                while (_isListening)
+                {
+                    var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(5));
+                    var location = await Geolocation.GetLocationAsync(request);
+
+                    if (location is not null)
+                    {
+                        // marshal update to UI thread so bindings and behaviors get notified safely
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            UserLocation = location;
+                        });
+                    }
+
+                    await Task.Delay(5000);
+                }
+            }
+        }
 
         public Dictionary<string, ImageSource> ChipFilters { get; } = new()
         {
@@ -27,7 +67,9 @@ namespace CulturalVenue.ViewModels
         public MainViewModel()
         {
             InitializeMap();
-            
+
+            UserLocation = new Location(45.7128, -74.0060);
+
             Events = new ObservableCollection<Event>
             {
                 new Event

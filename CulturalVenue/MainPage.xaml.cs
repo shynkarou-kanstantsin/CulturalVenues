@@ -16,5 +16,15 @@ namespace CulturalVenue
                 mapControl.Map.Widgets.Clear();
             }
         }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (BindingContext is ViewModels.MainViewModel viewModel)
+            {
+                await viewModel.StartLocationUpdates();
+            }
+        }
     }
 }
