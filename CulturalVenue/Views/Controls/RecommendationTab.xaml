@@ -32,8 +32,7 @@
 
             <Label 
                 Text="{Binding Date, StringFormat='{0:dd.MM.yyyy}'}"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" />
+                FontSize="12" VerticalOptions="Center" HorizontalOptions="Start" />
         </HorizontalStackLayout>
         
         <HorizontalStackLayout
@@ -41,13 +40,13 @@
             <Image Source="schedule.png" HeightRequest="20"/>
             <Label 
                 Text="{Binding TimeStart, StringFormat='{0:hh\\:mm}'}"
-                VerticalOptions="Center"/>
+                FontSize="12" VerticalOptions="Center"/>
             <Label 
-                Text=" • "
-                VerticalOptions="Center"/>
+                Text="  •  "
+                FontSize="12" VerticalOptions="Center"/>
             <Label 
                 Text="{Binding Type}"
-                VerticalOptions="Center"/>
+                FontSize="12" VerticalOptions="Center"/>
         </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentView>

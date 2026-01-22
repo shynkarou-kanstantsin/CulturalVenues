@@ -9,46 +9,45 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="55*"/>
+            <RowDefinition Height="65*"/>
             <RowDefinition Height="35*"/>
         </Grid.RowDefinitions>
 
+        
         <Grid Grid.Row="0">
-            <HorizontalStackLayout Padding="10" HorizontalOptions="Center">
-                <ContentView>
-                    <controls:SearchBar/>
-                </ContentView>
-
-                <Border StrokeShape="RoundRectangle 35" StrokeThickness="1.5" Stroke="Black" WidthRequest="35" HeightRequest="35" Margin="7">
-                    <Image Source="person.png"/>
-                </Border>
-            </HorizontalStackLayout>
-        </Grid>
-
-        <Grid Grid.Row="1">
             <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}">
                 <mapsui:MapControl.Behaviors>
                     <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"/>
                 </mapsui:MapControl.Behaviors>
             </mapsui:MapControl>
 
-            <CollectionView ItemsSource="{Binding ChipFilters}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,10,10,0">
+            <VerticalStackLayout> 
 
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
-                </CollectionView.ItemsLayout>
+                <HorizontalStackLayout HorizontalOptions="Center" Margin="0,15,0,0">
+                    <ContentView>
+                        <controls:SearchBar/>
+                    </ContentView>
+                </HorizontalStackLayout>
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <controls:ChipFilters/>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
+                <CollectionView ItemsSource="{Binding ChipFilters}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,7,10,0">
 
-            </CollectionView>
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <controls:ChipFilters/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+                
+            </VerticalStackLayout>
+          
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1">
             <VerticalStackLayout>
                 <Label Text="Events nearby" Margin="10,10,0,0" FontAttributes="Bold" FontSize="18"/>
 
