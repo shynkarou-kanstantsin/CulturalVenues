@@ -1,6 +1,6 @@
 ﻿namespace CulturalVenue.Models
 {
-    internal class Venue
+    public class Venue
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; }

@@ -1,15 +1,16 @@
-﻿using Mapsui.UI.Maui;
+﻿using CulturalVenue.ViewModels;
+using Mapsui.UI.Maui;
 using Mapsui.Widgets;
 using Mapsui.Widgets.InfoWidgets;
 
-namespace CulturalVenue
+namespace CulturalVenue.Views.Pages
 {
     public partial class MainPage : ContentPage
     {
-        public MainPage()
+        public MainPage(MainViewModel _mainViewModel)
         {
             InitializeComponent();
-            BindingContext = new ViewModels.MainViewModel();
+            BindingContext = _mainViewModel;
 
             if (mapControl.Map != null)
             {

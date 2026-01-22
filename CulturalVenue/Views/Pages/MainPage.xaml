@@ -4,7 +4,7 @@
              xmlns:controls="clr-namespace:CulturalVenue.Views.Controls"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              xmlns:behaviors="clr-namespace:CulturalVenue.Behaviors"
-             x:Class="CulturalVenue.MainPage">
+             x:Class="CulturalVenue.Views.Pages.MainPage">
 
     <Grid>
 

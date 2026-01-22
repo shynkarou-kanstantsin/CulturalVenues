@@ -9,7 +9,7 @@ using Mapsui.Projections;
 
 namespace CulturalVenue.ViewModels
 {
-    internal partial class MainViewModel : ObservableObject
+    public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
         private Mapsui.Map map;

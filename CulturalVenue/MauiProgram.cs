@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using SkiaSharp.Views.Maui.Controls.Hosting;
+using CommunityToolkit.Maui;
+using CulturalVenue.ViewModels;
+using CulturalVenue.Views.Pages;
 
 #if ANDROID
 using Android.Widget;
@@ -21,7 +24,7 @@ namespace CulturalVenue
             builder
                 .UseMauiApp<App>()
                 .UseSkiaSharp()
-                //.UseMauiMaps()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -36,6 +39,11 @@ namespace CulturalVenue
                     editText.Background = null;
                 }
             });
+
+            builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddSingleton<MainViewModel>();
+
+
 #endif
 
 
