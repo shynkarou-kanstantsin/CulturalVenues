@@ -173,5 +173,19 @@ namespace CulturalVenue.ViewModels
             this.Map = map;
 
         }
+
+        [RelayCommand]
+        public async Task SelectEvent(Event selectedEvent)
+        {
+            if (selectedEvent == null)
+                return;
+
+            var navigationParameters = new Dictionary<string, object>
+            {
+                { "Event", selectedEvent }
+            };
+
+            await Shell.Current.GoToAsync("EventPage", navigationParameters);
+        }
     }
 }

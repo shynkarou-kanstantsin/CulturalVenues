@@ -4,6 +4,12 @@
              x:Class="CulturalVenue.Views.Controls.RecommendationTab">
 
     <VerticalStackLayout WidthRequest="150" HeightRequest="210">
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer 
+                Command="{Binding BindingContext.SelectEventCommand, Source={RelativeSource AncestorType={x:Type CollectionView}}}"
+                CommandParameter="{Binding .}"/>
+        </VerticalStackLayout.GestureRecognizers>
+        
         <Border HeightRequest="120" WidthRequest="150" StrokeThickness="0"
             StrokeShape="RoundRectangle 20">
             <Grid>

@@ -62,6 +62,8 @@ namespace CulturalVenue
 
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
+            builder.Services.AddTransient<EventPage>();
+            builder.Services.AddTransient<EventPageViewModel>();
 
             return builder.Build();
         }
