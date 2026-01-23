@@ -4,6 +4,8 @@ using SkiaSharp.Views.Maui.Controls.Hosting;
 using CommunityToolkit.Maui;
 using CulturalVenue.ViewModels;
 using CulturalVenue.Views.Pages;
+using Syncfusion.Maui.Toolkit.Hosting;
+
 
 #if ANDROID
 using Android.Widget;
@@ -23,6 +25,7 @@ namespace CulturalVenue
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .ConfigureSyncfusionToolkit()
                 .UseSkiaSharp()
                 .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
@@ -40,10 +43,6 @@ namespace CulturalVenue
                 }
             });
 
-            builder.Services.AddSingleton<MainPage>();
-            builder.Services.AddSingleton<MainViewModel>();
-
-
 #endif
 
 
@@ -60,6 +59,9 @@ namespace CulturalVenue
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddSingleton<MainViewModel>();
 
             return builder.Build();
         }

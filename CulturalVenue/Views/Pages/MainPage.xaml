@@ -4,70 +4,67 @@
              xmlns:controls="clr-namespace:CulturalVenue.Views.Controls"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              xmlns:behaviors="clr-namespace:CulturalVenue.Behaviors"
+             xmlns:bottomSheet="clr-namespace:Syncfusion.Maui.Toolkit.BottomSheet;assembly=Syncfusion.Maui.Toolkit"
              x:Class="CulturalVenue.Views.Pages.MainPage">
 
     <Grid>
+        <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}">
+            <mapsui:MapControl.Behaviors>
+                <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"/>
+            </mapsui:MapControl.Behaviors>
+        </mapsui:MapControl>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="65*"/>
-            <RowDefinition Height="35*"/>
-        </Grid.RowDefinitions>
+        <VerticalStackLayout>
 
-        
-        <Grid Grid.Row="0">
-            <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}">
-                <mapsui:MapControl.Behaviors>
-                    <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"/>
-                </mapsui:MapControl.Behaviors>
-            </mapsui:MapControl>
+            <HorizontalStackLayout HorizontalOptions="Center" Margin="0,15,0,0">
+                <ContentView>
+                    <controls:SearchBar/>
+                </ContentView>
+            </HorizontalStackLayout>
 
-            <VerticalStackLayout> 
+            <CollectionView ItemsSource="{Binding ChipFilters}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,7,10,0">
 
-                <HorizontalStackLayout HorizontalOptions="Center" Margin="0,15,0,0">
-                    <ContentView>
-                        <controls:SearchBar/>
-                    </ContentView>
-                </HorizontalStackLayout>
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
+                </CollectionView.ItemsLayout>
 
-                <CollectionView ItemsSource="{Binding ChipFilters}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,7,10,0">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <controls:ChipFilters/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
 
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
-                    </CollectionView.ItemsLayout>
+            </CollectionView>
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <controls:ChipFilters/>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
+        </VerticalStackLayout>
 
-                </CollectionView>
-                
-            </VerticalStackLayout>
-          
-        </Grid>
+        <bottomSheet:SfBottomSheet x:Name="bottomSheet" CornerRadius="15, 15, 0, 0" HalfExpandedRatio="0.42" FullExpandedRatio="0.9"  CollapsedHeight="100" CollapseOnOverlayTap="False" Background="White">
 
-        <Grid Grid.Row="1">
-            <VerticalStackLayout>
-                <Label Text="Events nearby" Margin="10,10,0,0" FontAttributes="Bold" FontSize="18"/>
+            <bottomSheet:SfBottomSheet.BottomSheetContent>
 
-                <CollectionView
-                    ItemsSource="{Binding Events}"
-                    Footer="{x:Null}"
-                    ItemSizingStrategy="MeasureFirstItem"
-                    Margin="10,10,10,0">
+                <VerticalStackLayout BackgroundColor="White">
+                    <Label Text="Events nearby" Margin="10,10,0,0" FontAttributes="Bold" FontSize="18"/>
 
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
-                    </CollectionView.ItemsLayout>
+                    <CollectionView
+                        ItemsSource="{Binding Events}"
+                        Footer="{x:Null}"
+                        ItemSizingStrategy="MeasureFirstItem"
+                        Margin="10,10,10,0">
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <controls:RecommendationTab/>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </VerticalStackLayout>
-        </Grid>
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="20"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <controls:RecommendationTab/>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+            </bottomSheet:SfBottomSheet.BottomSheetContent>
+        </bottomSheet:SfBottomSheet>
+
     </Grid>
 </ContentPage>
