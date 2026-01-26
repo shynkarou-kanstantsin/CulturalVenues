@@ -5,6 +5,7 @@ using CommunityToolkit.Maui;
 using CulturalVenue.ViewModels;
 using CulturalVenue.Views.Pages;
 using Syncfusion.Maui.Toolkit.Hosting;
+using Microsoft.Maui.Maps;
 
 
 #if ANDROID
@@ -27,6 +28,7 @@ namespace CulturalVenue
                 .UseMauiApp<App>()
                 .ConfigureSyncfusionToolkit()
                 .UseSkiaSharp()
+                .UseMauiMaps()
                 .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {

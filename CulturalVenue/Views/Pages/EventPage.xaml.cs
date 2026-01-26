@@ -8,5 +8,5 @@ public partial class EventPage : ContentPage
 	{
 		InitializeComponent();
 		BindingContext = _eventPageViewModel;
-	}
+    }
 }

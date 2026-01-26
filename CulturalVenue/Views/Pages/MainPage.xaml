@@ -2,17 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:CulturalVenue.Views.Controls"
-             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              xmlns:behaviors="clr-namespace:CulturalVenue.Behaviors"
              xmlns:bottomSheet="clr-namespace:Syncfusion.Maui.Toolkit.BottomSheet;assembly=Syncfusion.Maui.Toolkit"
              x:Class="CulturalVenue.Views.Pages.MainPage">
 
     <Grid>
-        <mapsui:MapControl x:Name="mapControl" Map="{Binding Map}">
-            <mapsui:MapControl.Behaviors>
-                <behaviors:MapPinsBehavior ItemSource="{Binding BindingContext.Events, Source={x:Reference mapControl}}"/>
-            </mapsui:MapControl.Behaviors>
-        </mapsui:MapControl>
+        <controls:MapView />
 
         <VerticalStackLayout>
 

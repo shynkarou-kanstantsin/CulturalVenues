@@ -1,7 +1,4 @@
 ﻿using CulturalVenue.ViewModels;
-using Mapsui.UI.Maui;
-using Mapsui.Widgets;
-using Mapsui.Widgets.InfoWidgets;
 using Syncfusion.Maui.Toolkit.BottomSheet;
 
 namespace CulturalVenue.Views.Pages
@@ -12,11 +9,6 @@ namespace CulturalVenue.Views.Pages
         {
             InitializeComponent();
             BindingContext = _mainViewModel;
-
-            if (mapControl.Map != null)
-            {
-                mapControl.Map.Widgets.Clear();
-            }
         }
 
         protected override void OnAppearing()
