@@ -12,7 +12,8 @@
         </ResourceDictionary>
     </ContentView.Resources>
 
-    <maps:Map x:Name="Map" MapType="Street" ItemsSource="{Binding Events}">
+    <maps:Map x:Name="Map" MapType="Street" ItemsSource="{Binding Events}" MyLocationEnabled="True">
+
         <maps:Map.ItemTemplate>
             <DataTemplate>
                 <maps:Pin Position="{Binding Venue, Converter={StaticResource PositionConverter}}"
