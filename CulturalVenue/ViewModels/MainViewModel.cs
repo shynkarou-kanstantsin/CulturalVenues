@@ -8,6 +8,8 @@ namespace CulturalVenue.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
+        public ObservableCollection<Event> Events { get; set; }
+
         public Dictionary<string, ImageSource> ChipFilters { get; } = new()
         {
             { "Arts & Theater", "art" },
@@ -15,8 +17,6 @@ namespace CulturalVenue.ViewModels
             { "Film", "film" },
             {"Sports", "sport" }
         };
-
-        public ObservableCollection<Event> Events { get; set; }
 
         public MainViewModel()
         {

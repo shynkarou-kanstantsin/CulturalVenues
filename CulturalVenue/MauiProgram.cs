@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
-using SkiaSharp.Views.Maui.Controls.Hosting;
 using CommunityToolkit.Maui;
 using CulturalVenue.ViewModels;
 using CulturalVenue.Views.Pages;
 using Syncfusion.Maui.Toolkit.Hosting;
-using Microsoft.Maui.Maps;
+using Maui.GoogleMaps.Hosting;
+using Maui.GoogleMaps;
 
 
 #if ANDROID
@@ -27,14 +27,18 @@ namespace CulturalVenue
             builder
                 .UseMauiApp<App>()
                 .ConfigureSyncfusionToolkit()
-                .UseSkiaSharp()
-                .UseMauiMaps()
                 .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
+#if ANDROID
+        builder.UseGoogleMaps();
+#elif IOS
+        builder.UseGoogleMaps("AIzaSyDBGCNTJvT-0dT8jtjjH4tLM7eY_x9iGj4");
+#endif
 
 #if ANDROID
             EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
