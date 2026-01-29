@@ -7,14 +7,14 @@ namespace CulturalVenue.Models
 {
     internal class VenuePin : Pin
     {
-        public Guid VenueId { get; set; }
+        public string VenueId { get; set; }
 
         private static readonly Dictionary<string, string> EventTypeToIcon = new()
         {
             { "Music", "music.png" },
             { "Film", "film.png" },
             { "Sports", "sport.png" },
-            { "Arts & Theater", "art.png" }
+            { "Arts & Theatre", "art.png" }
         };
     }
 }

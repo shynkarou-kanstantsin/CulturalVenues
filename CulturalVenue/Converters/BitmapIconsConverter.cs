@@ -17,10 +17,10 @@ namespace CulturalVenue.Converters
                     "Music" => BitmapDescriptorFactory.FromBundle("music_pin"),
                     "Sports" => BitmapDescriptorFactory.FromBundle("sport_pin"),
                     "Film" => BitmapDescriptorFactory.FromBundle("film_pin"),
-                    "Arts & Theater" => BitmapDescriptorFactory.FromBundle("art_pin")
+                    "Arts & Theatre" => BitmapDescriptorFactory.FromBundle("art_pin")
                 };
             }
-            return "art_pin";
+            return BitmapDescriptorFactory.FromBundle("art_pin");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,7 +1,9 @@
-﻿using CulturalVenue.Models;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CulturalVenue.Models;
+using CulturalVenue.Services;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 
 namespace CulturalVenue.ViewModels
@@ -9,38 +11,23 @@ namespace CulturalVenue.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         public ObservableCollection<Event> Events { get; set; }
+        public ObservableCollection<Venue> Venues { get; set; } 
 
         public Dictionary<string, ImageSource> ChipFilters { get; } = new()
         {
-            { "Arts & Theater", "art" },
+            { "Arts & Theatre", "art" },
             { "Music", "music" },
             { "Film", "film" },
             {"Sports", "sport" }
         };
 
+        private ScreenDetails _lastScreenDetails;
+
         public MainViewModel()
         {
+            Venues = new ObservableCollection<Venue>();
             Events = new ObservableCollection<Event>
             {
-                new Event
-                {
-                    Title = "Art Exhibition",
-                    Description = "An exhibition showcasing local artists.",
-                    Date = new DateTime(2024, 7, 15),
-                    TimeStart = new TimeSpan(18, 0, 0),
-                    StartingPrice = 10,
-                    Currency = "USD",
-                    PhotoUrl = new List<string> { "https://248006.selcdn.ru/main/iblock/344/3442c5677ef3477de3c980080d907a54/550be50fffb2d4448f55696361453d59.jpg" },
-                    Type = "Arts & Theater",
-                    Venue = new Venue
-                    {
-                        Name = "City Art Gallery",
-                        Latitude = 40.7128,
-                        Longitude = -74.0060,
-                        Address = "123 Art St, New York, NY",
-                        PhotoUrl = new List<string> { "https://example.com/venue1.jpg" }
-                    }
-                },
                 new Event
                 {
                     Title = "Classical Music Concert",
@@ -62,17 +49,17 @@ namespace CulturalVenue.ViewModels
                 },
                 new Event
                 {
-                    Title = "Theater Play",
+                    Title = "Theatre Play",
                     Description = "A captivating drama performed by local actors.",
                     Date = new DateTime(2024, 9, 10),
                     TimeStart = new TimeSpan(19, 30, 0),
                     StartingPrice = 15,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://www.maly.ru/images/performances/5a43aa03ea87e.jpg" },
-                    Type = "Arts & Theater",
+                    Type = "Arts & Theatre",
                     Venue = new Venue
                     {
-                        Name = "Downtown Theater",
+                        Name = "Downtown Theatre",
                         Latitude = 41.8781,
                         Longitude = -87.6298,
                         Address = "789 Drama Rd, Chicago, IL",
@@ -107,10 +94,10 @@ namespace CulturalVenue.ViewModels
                     StartingPrice = 30m,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://godance.tv/sites/default/files/users/1/liteblog/122/084D8CD4-7492-405E-B31D-462E4ADC585A.jpeg" },
-                    Type = "Arts & Theater",
+                    Type = "Arts & Theatre",
                     Venue = new Venue
                     {
-                        Name = "City Dance Theater",
+                        Name = "City Dance Theatre",
                         Latitude = 33.4484,
                         Longitude = -112.0740,
                         Address = "654 Dance Blvd, Phoenix, AZ",
@@ -170,6 +157,25 @@ namespace CulturalVenue.ViewModels
             };
 
             await Shell.Current.GoToAsync("EventPage", navigationParameters);
+        }
+
+        public async void OnScreenDetailsChanged(object sender, ScreenDetails details)
+        {
+           await LoadEvents(details);
+        }
+
+        private async Task LoadEvents(ScreenDetails details)
+        {
+            var results = await TicketmasterService.GetEventsByMapPosition(details);
+            
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Venues.Clear();
+                foreach (var ev in results) 
+                {
+                    Venues.Add(ev); 
+                }
+            });
         }
     }
 }

@@ -12,14 +12,14 @@
         </ResourceDictionary>
     </ContentView.Resources>
 
-    <maps:Map x:Name="Map" MapType="Street" ItemsSource="{Binding Events}" MyLocationEnabled="True">
+    <maps:Map x:Name="Map" MapType="Street" ItemsSource="{Binding Venues}" Padding="0,110,0,110">
 
         <maps:Map.ItemTemplate>
             <DataTemplate>
-                <maps:Pin Position="{Binding Venue, Converter={StaticResource PositionConverter}}"
-                          Label="{Binding Title}"
-                          Address="{Binding Venue.Address}"
-                          Type="Place"
+                <maps:Pin Position="{Binding ., Converter={StaticResource PositionConverter}}"
+                          Label="{Binding Name}"
+                          Address="{Binding Address}"
+                          Type="{Binding Type}"
                           Icon="{Binding Type, Converter={StaticResource BitmapIconsConverter}}"/>
             </DataTemplate>
         </maps:Map.ItemTemplate>

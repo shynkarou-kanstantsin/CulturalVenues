@@ -6,7 +6,7 @@
              x:Class="CulturalVenue.Views.Pages.MainPage">
 
     <Grid>
-        <controls:MapView />
+        <controls:MapView x:Name="Map"/>
 
         <VerticalStackLayout>
 
