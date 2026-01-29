@@ -37,7 +37,7 @@ namespace CulturalVenue
 #if ANDROID
         builder.UseGoogleMaps();
 #elif IOS
-        builder.UseGoogleMaps("AIzaSyD_KJ5ToOi03Y_ltcw6uBFDRczPwgibeU8");
+        builder.UseGoogleMaps(Config.GoogleiOSKey);
 #endif
 
 #if ANDROID

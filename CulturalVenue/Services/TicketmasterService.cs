@@ -18,7 +18,7 @@ namespace CulturalVenue.Services
             BaseAddress = new Uri("https://app.ticketmaster.com/discovery/v2/"),
         };
 
-        private const string ApiKey = "JgZV2ojbY70gG5XJ20bnORcxb9hJ5v2k";
+        private const string ApiKey = Config.TicketmasterKey;
 
         public static async Task<List<Venue>> GetEventsByMapPosition(ScreenDetails screenDetails)
         {
