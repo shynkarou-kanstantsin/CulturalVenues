@@ -1,54 +1,33 @@
-﻿using CulturalVenue.Models;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CulturalVenue.Models;
+using CulturalVenue.Services;
 using System.Collections.ObjectModel;
-using Mapsui;
-using Mapsui.Tiling;
-using Mapsui.Projections;
 
 
 namespace CulturalVenue.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
-        [ObservableProperty]
-        private Mapsui.Map map;
-
-        public Dictionary<string, ImageSource> ChipFilters { get; } = new()
+        public ObservableCollection<Event> Events { get; set; }
+        public ObservableCollection<Venue> Venues { get; set; } 
+        public ObservableCollection<ChipFilter> ChipFilterList { get; } = new()
         {
-            { "Arts & Theater", "art" },
-            { "Music", "music" },
-            { "Film", "film" },
-            {"Sports", "sport" }
+            new ChipFilter { Name = "Arts & Theatre", ImageSource = "art", IsSelected = false },
+            new ChipFilter { Name = "Music", ImageSource = "music", IsSelected = false },
+            new ChipFilter { Name = "Film", ImageSource = "film", IsSelected = false },
+            new ChipFilter { Name = "Sports", ImageSource = "sport", IsSelected = false }
         };
 
-        public ObservableCollection<Event> Events { get; set; }
+        private ScreenDetails _currentScreenDetails;
+
+        public string? activeChipFilterName { get; set; } = null;
 
         public MainViewModel()
         {
-            InitializeMap();
-            
+            Venues = new ObservableCollection<Venue>();
             Events = new ObservableCollection<Event>
             {
-                new Event
-                {
-                    Title = "Art Exhibition",
-                    Description = "An exhibition showcasing local artists.",
-                    Date = new DateTime(2024, 7, 15),
-                    TimeStart = new TimeSpan(18, 0, 0),
-                    StartingPrice = 10,
-                    Currency = "USD",
-                    PhotoUrl = new List<string> { "https://248006.selcdn.ru/main/iblock/344/3442c5677ef3477de3c980080d907a54/550be50fffb2d4448f55696361453d59.jpg" },
-                    Type = "Arts & Theater",
-                    Venue = new Venue
-                    {
-                        Name = "City Art Gallery",
-                        Latitude = 40.7128,
-                        Longitude = -74.0060,
-                        Address = "123 Art St, New York, NY",
-                        PhotoUrl = new List<string> { "https://example.com/venue1.jpg" }
-                    }
-                },
                 new Event
                 {
                     Title = "Classical Music Concert",
@@ -70,17 +49,17 @@ namespace CulturalVenue.ViewModels
                 },
                 new Event
                 {
-                    Title = "Theater Play",
+                    Title = "Theatre Play",
                     Description = "A captivating drama performed by local actors.",
                     Date = new DateTime(2024, 9, 10),
                     TimeStart = new TimeSpan(19, 30, 0),
                     StartingPrice = 15,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://www.maly.ru/images/performances/5a43aa03ea87e.jpg" },
-                    Type = "Arts & Theater",
+                    Type = "Arts & Theatre",
                     Venue = new Venue
                     {
-                        Name = "Downtown Theater",
+                        Name = "Downtown Theatre",
                         Latitude = 41.8781,
                         Longitude = -87.6298,
                         Address = "789 Drama Rd, Chicago, IL",
@@ -115,10 +94,10 @@ namespace CulturalVenue.ViewModels
                     StartingPrice = 30m,
                     Currency = "USD",
                     PhotoUrl = new List<string> { "https://godance.tv/sites/default/files/users/1/liteblog/122/084D8CD4-7492-405E-B31D-462E4ADC585A.jpeg" },
-                    Type = "Arts & Theater",
+                    Type = "Arts & Theatre",
                     Venue = new Venue
                     {
-                        Name = "City Dance Theater",
+                        Name = "City Dance Theatre",
                         Latitude = 33.4484,
                         Longitude = -112.0740,
                         Address = "654 Dance Blvd, Phoenix, AZ",
@@ -166,14 +145,6 @@ namespace CulturalVenue.ViewModels
             };
         }
 
-        public void InitializeMap()
-        {
-            var map = new Mapsui.Map();
-            map.Layers.Add(OpenStreetMap.CreateTileLayer());
-            this.Map = map;
-
-        }
-
         [RelayCommand]
         public async Task SelectEvent(Event selectedEvent)
         {
@@ -186,6 +157,56 @@ namespace CulturalVenue.ViewModels
             };
 
             await Shell.Current.GoToAsync("EventPage", navigationParameters);
+        }
+
+        [RelayCommand]
+        public async void FilterChipsChanged(ChipFilter choosedFilter)
+        {
+            if (!String.IsNullOrEmpty(activeChipFilterName))
+            {
+                if (activeChipFilterName == choosedFilter.Name)
+                {
+                    activeChipFilterName = null;
+                    choosedFilter.IsSelected = false;
+                    await LoadEvents(_currentScreenDetails);
+                    return;
+                }
+                else
+                {
+                    foreach (var chip in ChipFilterList)
+                    {
+                        if (chip.Name == activeChipFilterName)
+                        {
+                            chip.IsSelected = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            choosedFilter.IsSelected = true;
+            activeChipFilterName = choosedFilter.Name;
+            await LoadEvents(_currentScreenDetails);
+        }
+
+        public async void OnScreenDetailsChanged(object sender, ScreenDetails details)
+        {
+           _currentScreenDetails = details;
+            await LoadEvents(details);
+        }
+
+        private async Task LoadEvents(ScreenDetails details)
+        {
+            var results = await TicketmasterService.GetEventsByMapPosition(details, activeChipFilterName);
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Venues.Clear();
+                foreach (var ev in results)
+                {
+                    Venues.Add(ev);
+                }
+            });
         }
     }
 }

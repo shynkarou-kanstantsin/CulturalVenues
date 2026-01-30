@@ -7,7 +7,7 @@
 
     <ContentView.Resources>
         <ResourceDictionary>
-            <converters:SearchBarCleanButton x:Key="SearchBarCleanButton" />
+            <converters:SearchBarCleanButtonConverter x:Key="SearchBarCleanButtonConverter" />
         </ResourceDictionary>
     </ContentView.Resources>
 
@@ -35,7 +35,7 @@
 
             <Grid Grid.Column="2">
                 <Image Source="x"  HeightRequest="20"
-                       IsVisible="{Binding Text, Source={RelativeSource AncestorType={x:Type local:SearchBar}}, Converter={StaticResource SearchBarCleanButton}}">
+                       IsVisible="{Binding Text, Source={RelativeSource AncestorType={x:Type local:SearchBar}}, Converter={StaticResource SearchBarCleanButtonConverter}}">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ClearCommand, Source={RelativeSource AncestorType={x:Type local:SearchBar}}}"/>
                     </Image.GestureRecognizers>

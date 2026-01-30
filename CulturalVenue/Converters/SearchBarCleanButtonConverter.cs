@@ -2,7 +2,7 @@
 
 namespace CulturalVenue.Converters
 {
-    internal class SearchBarCleanButton : IValueConverter
+    internal class SearchBarCleanButtonConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

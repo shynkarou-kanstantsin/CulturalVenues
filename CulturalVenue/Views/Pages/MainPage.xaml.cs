@@ -1,22 +1,16 @@
 ﻿using CulturalVenue.ViewModels;
-using Mapsui.UI.Maui;
-using Mapsui.Widgets;
-using Mapsui.Widgets.InfoWidgets;
 using Syncfusion.Maui.Toolkit.BottomSheet;
 
 namespace CulturalVenue.Views.Pages
 {
     public partial class MainPage : ContentPage
     {
+        private bool _handlingOverlayClose;
+
         public MainPage(MainViewModel _mainViewModel)
         {
             InitializeComponent();
             BindingContext = _mainViewModel;
-
-            if (mapControl.Map != null)
-            {
-                mapControl.Map.Widgets.Clear();
-            }
         }
 
         protected override void OnAppearing()
@@ -26,16 +20,24 @@ namespace CulturalVenue.Views.Pages
             bottomSheet.State = BottomSheetState.Collapsed;
             bottomSheet.IsOpen = true;
             bottomSheet.StateChanged += OnBottomSheetStateChanged;
+
+            if (BindingContext is MainViewModel _mainViewModel)
+            {
+                Map.ScreenDetailsChanged += _mainViewModel.OnScreenDetailsChanged;
+            }
         }
 
         protected override void OnDisappearing()
         {
             bottomSheet.StateChanged -= OnBottomSheetStateChanged;
 
+            if (BindingContext is MainViewModel _mainViewModel)
+            {
+                Map.ScreenDetailsChanged -= _mainViewModel.OnScreenDetailsChanged;
+            }
+
             base.OnDisappearing();
         }
-
-        private bool _handlingOverlayClose;
 
         private async void OnBottomSheetStateChanged(object sender, StateChangedEventArgs e)
         {
