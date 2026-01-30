@@ -69,16 +69,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\Controls\ChipFilters.xaml">
+	  <MauiXaml Update="Views\Controls\ChipFilterControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Controls\MapView.xaml">
+	  <MauiXaml Update="Views\Controls\MapControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Controls\RecommendationTab.xaml">
+	  <MauiXaml Update="Views\Controls\RecommendationTabControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Controls\SearchBar.xaml">
+	  <MauiXaml Update="Views\Controls\SearchBarControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Controls\SearchResultControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Controls\SearchResultPannelControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Pages\EventPage.xaml">
@@ -88,6 +94,21 @@
 
 	<ItemGroup>
 	  <Folder Include="Platforms\Android\Resources\drawable\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\Controls\ChipFilterControl.xaml.cs">
+	    <DependentUpon>ChipFilterControl.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Controls\MapControl.xaml.cs">
+	    <DependentUpon>MapControl.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Controls\RecommendationTabControl.xaml.cs">
+	    <DependentUpon>RecommendationTabControl.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Controls\SearchBarControl.xaml.cs">
+	    <DependentUpon>SearchBarControl.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

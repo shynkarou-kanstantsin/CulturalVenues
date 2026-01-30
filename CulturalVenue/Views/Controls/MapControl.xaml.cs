@@ -34,7 +34,6 @@ public partial class MapView : ContentView
     protected override void OnBindingContextChanged()
     {
         base.OnBindingContextChanged();
-        Debug.WriteLine($"MapView BC: {BindingContext?.GetType().Name}");
         Map.BindingContext = BindingContext;
     }
 
@@ -56,17 +55,11 @@ public partial class MapView : ContentView
         double centerLongitude = Map.VisibleRegion.Center.Longitude;
         double centerLatitude = Map.VisibleRegion.Center.Latitude;
         
-        Location northEast = new Location(
-            centerLatitude + (Map.VisibleRegion.LatitudeDegrees / 2),
-            centerLongitude + (Map.VisibleRegion.LongitudeDegrees / 2)
-        );
+        Location center = new Location(centerLatitude, centerLongitude);
 
-        Location southWest = new Location(
-            Map.VisibleRegion.Center.Latitude - (Map.VisibleRegion.LatitudeDegrees / 2),
-            Map.VisibleRegion.Center.Longitude - (Map.VisibleRegion.LongitudeDegrees / 2)
-        );
-        
-        double radius = Location.CalculateDistance(northEast, southWest, DistanceUnits.Kilometers) / 2;
+        Location westSide = new Location(centerLatitude, centerLongitude + Map.VisibleRegion.LongitudeDegrees / 2);
+
+        double radius = Location.CalculateDistance(center, westSide, DistanceUnits.Kilometers) / 2;
     
         var details = new Models.ScreenDetails(
             centerLatitude,
@@ -74,10 +67,6 @@ public partial class MapView : ContentView
             radius
         );
         
-        
-        Debug.WriteLine($"ScreenDetails fired: lat={centerLatitude}, lon={centerLongitude}, r={radius}");
-
-
         ScreenDetailsChanged?.Invoke(this, details);
     }
 

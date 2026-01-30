@@ -11,6 +11,8 @@ namespace CulturalVenue.ViewModels
     {
         public ObservableCollection<Event> Events { get; set; }
         public ObservableCollection<Venue> Venues { get; set; } 
+        public ObservableCollection<SearchResult> SearchResultEvents { get; set; }
+        public ObservableCollection<SearchResult> SearchResultVenues { get; set; }
         public ObservableCollection<ChipFilter> ChipFilterList { get; } = new()
         {
             new ChipFilter { Name = "Arts & Theatre", ImageSource = "art", IsSelected = false },
@@ -22,9 +24,19 @@ namespace CulturalVenue.ViewModels
         private ScreenDetails _currentScreenDetails;
 
         public string? activeChipFilterName { get; set; } = null;
+        
+        [ObservableProperty]
+        private string searchQuery;
+
+        [ObservableProperty]
+        private bool searchResultEventsIsEmpty;
+        [ObservableProperty]
+        private bool searchResultVenuesIsEmpty;
 
         public MainViewModel()
         {
+            SearchResultEvents = new ObservableCollection<SearchResult>();
+            SearchResultVenues = new ObservableCollection<SearchResult>();
             Venues = new ObservableCollection<Venue>();
             Events = new ObservableCollection<Event>
             {
