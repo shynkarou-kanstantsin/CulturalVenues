@@ -56,7 +56,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AndroidResource Remove="Platforms\Android\Resources\values\mapsKey.xml" />
+	  <None Remove="Platforms\Android\Resources\values\mapsKey.xml" />
 	</ItemGroup>
 
 	<ItemGroup>

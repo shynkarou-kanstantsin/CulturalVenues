@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using CulturalVenue.Models;
 using CulturalVenue.Services;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 
 namespace CulturalVenue.ViewModels
@@ -12,16 +11,17 @@ namespace CulturalVenue.ViewModels
     {
         public ObservableCollection<Event> Events { get; set; }
         public ObservableCollection<Venue> Venues { get; set; } 
-
-        public Dictionary<string, ImageSource> ChipFilters { get; } = new()
+        public ObservableCollection<ChipFilter> ChipFilterList { get; } = new()
         {
-            { "Arts & Theatre", "art" },
-            { "Music", "music" },
-            { "Film", "film" },
-            {"Sports", "sport" }
+            new ChipFilter { Name = "Arts & Theatre", ImageSource = "art", IsSelected = false },
+            new ChipFilter { Name = "Music", ImageSource = "music", IsSelected = false },
+            new ChipFilter { Name = "Film", ImageSource = "film", IsSelected = false },
+            new ChipFilter { Name = "Sports", ImageSource = "sport", IsSelected = false }
         };
 
-        private ScreenDetails _lastScreenDetails;
+        private ScreenDetails _currentScreenDetails;
+
+        public string? activeChipFilterName { get; set; } = null;
 
         public MainViewModel()
         {
@@ -159,21 +159,52 @@ namespace CulturalVenue.ViewModels
             await Shell.Current.GoToAsync("EventPage", navigationParameters);
         }
 
+        [RelayCommand]
+        public async void FilterChipsChanged(ChipFilter choosedFilter)
+        {
+            if (!String.IsNullOrEmpty(activeChipFilterName))
+            {
+                if (activeChipFilterName == choosedFilter.Name)
+                {
+                    activeChipFilterName = null;
+                    choosedFilter.IsSelected = false;
+                    await LoadEvents(_currentScreenDetails);
+                    return;
+                }
+                else
+                {
+                    foreach (var chip in ChipFilterList)
+                    {
+                        if (chip.Name == activeChipFilterName)
+                        {
+                            chip.IsSelected = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            choosedFilter.IsSelected = true;
+            activeChipFilterName = choosedFilter.Name;
+            await LoadEvents(_currentScreenDetails);
+        }
+
         public async void OnScreenDetailsChanged(object sender, ScreenDetails details)
         {
-           await LoadEvents(details);
+           _currentScreenDetails = details;
+            await LoadEvents(details);
         }
 
         private async Task LoadEvents(ScreenDetails details)
         {
-            var results = await TicketmasterService.GetEventsByMapPosition(details);
-            
+            var results = await TicketmasterService.GetEventsByMapPosition(details, activeChipFilterName);
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 Venues.Clear();
-                foreach (var ev in results) 
+                foreach (var ev in results)
                 {
-                    Venues.Add(ev); 
+                    Venues.Add(ev);
                 }
             });
         }

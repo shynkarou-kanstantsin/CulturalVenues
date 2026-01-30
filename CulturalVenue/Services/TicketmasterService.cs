@@ -1,11 +1,6 @@
 ﻿using CulturalVenue.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace CulturalVenue.Services
 {
@@ -20,7 +15,7 @@ namespace CulturalVenue.Services
 
         private const string ApiKey = Config.TicketmasterKey;
 
-        public static async Task<List<Venue>> GetEventsByMapPosition(ScreenDetails screenDetails)
+        public static async Task<List<Venue>> GetEventsByMapPosition(ScreenDetails screenDetails, string? activeChipFilterName)
         {
             var latitude = screenDetails.CenterLatitude.ToString("F6", CultureInfo.InvariantCulture);
             var longitude = screenDetails.CenterLongitude.ToString("F6", CultureInfo.InvariantCulture);
@@ -29,7 +24,14 @@ namespace CulturalVenue.Services
             string startDateTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
             string endDateTime = DateTime.UtcNow.AddDays(10).ToString("yyyy-MM-ddTHH:mm:ssZ");
 
-            var url = $"events?apikey={ApiKey}&latlong={latitude},{longitude}&radius={radius}&unit=km&startDateTime={startDateTime}&endDateTime={endDateTime}&size=40";
+            string filter = "";
+
+            if (!string.IsNullOrEmpty(activeChipFilterName))
+            {
+                filter = $"&segmentName={Uri.EscapeDataString(activeChipFilterName)}";
+            }
+
+            var url = $"events?apikey={ApiKey}&latlong={latitude},{longitude}&radius={radius}&unit=km&startDateTime={startDateTime}&endDateTime={endDateTime}{filter}&size=40";
 
             try
             {

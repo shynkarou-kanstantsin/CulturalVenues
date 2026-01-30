@@ -18,7 +18,7 @@ public partial class MapView : ContentView
         
         Map.PropertyChanged += Map_PropertyChanged;
         timer = Dispatcher.CreateTimer();
-        timer.Interval = TimeSpan.FromMilliseconds(500);
+        timer.Interval = TimeSpan.FromMilliseconds(800);
 
         timer.Tick += (s, e) =>
         {

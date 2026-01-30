@@ -363,5 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Секреты и конфиги
-Config.cs
 mapsKey.xml
+Config.cs
