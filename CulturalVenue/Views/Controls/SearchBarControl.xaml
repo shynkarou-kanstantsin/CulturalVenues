@@ -29,7 +29,7 @@
             <Grid Grid.Column="1">
                 <ContentView>
                     <Entry Placeholder="Search venues or events..." VerticalOptions="Center"
-                           Text="{Binding Text, Source={RelativeSource AncestorType={x:Type local:SearchBar}}}"/>
+                           Text="{Binding Text, Source={RelativeSource AncestorType={x:Type local:SearchBar}}, UpdateSourceEventName=TextChanged}"/>
                 </ContentView>
             </Grid>
 

@@ -16,7 +16,7 @@
                 </ContentView>
             </HorizontalStackLayout>
 
-            <ContentView IsVisible="Collapse">
+            <ContentView IsVisible="{Binding isSearchPanelVisible}">
                 <controls:SearchResultPannelControl/>
             </ContentView>
             

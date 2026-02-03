@@ -4,7 +4,7 @@
              x:Class="CulturalVenue.Views.Controls.SearchResultControl">
     
     <HorizontalStackLayout>
-        <Image Source="{Binding ImageSource}"/>
+        <Image Source="{Binding Icon}"/>
 
         <VerticalStackLayout>
             <Label 

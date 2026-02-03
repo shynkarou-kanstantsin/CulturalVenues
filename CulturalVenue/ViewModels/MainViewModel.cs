@@ -23,6 +23,8 @@ namespace CulturalVenue.ViewModels
 
         private ScreenDetails _currentScreenDetails;
 
+        private CancellationTokenSource _cancellationTokenSource;
+
         public string? activeChipFilterName { get; set; } = null;
         
         [ObservableProperty]
@@ -32,11 +34,21 @@ namespace CulturalVenue.ViewModels
         private bool searchResultEventsIsEmpty;
         [ObservableProperty]
         private bool searchResultVenuesIsEmpty;
+        [ObservableProperty]
+        private bool isSearchPanelVisible = false;
 
         public MainViewModel()
         {
             SearchResultEvents = new ObservableCollection<SearchResult>();
             SearchResultVenues = new ObservableCollection<SearchResult>();
+            SearchResultEvents.Add(new SearchResult
+            {
+                Name = "Sample Event",
+                Type = "Music",
+                Id = "E1",
+                Description = "This is a sample event description.",
+                Icon = "music"
+            });
             Venues = new ObservableCollection<Venue>();
             Events = new ObservableCollection<Event>
             {
@@ -199,6 +211,77 @@ namespace CulturalVenue.ViewModels
             choosedFilter.IsSelected = true;
             activeChipFilterName = choosedFilter.Name;
             await LoadEvents(_currentScreenDetails);
+        }
+
+        partial void OnSearchQueryChanged(string value)
+        {
+            // Мы не можем использовать await здесь, поэтому запускаем Task
+            // Использование Task.Run или просто вызов асинхронного метода
+            _ = StartDelayedSearchAsync();
+        }
+
+        private async Task StartDelayedSearchAsync()
+        {
+            if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 3)
+            {
+                SearchResultEvents.Clear();
+                SearchResultVenues.Clear();
+                SearchResultEventsIsEmpty = true;
+                SearchResultVenuesIsEmpty = true;
+                return;
+            }
+            else
+            {
+                if (_cancellationTokenSource is not null)
+                {
+                    _cancellationTokenSource.Cancel();
+                    _cancellationTokenSource.Dispose();
+                }
+
+                _cancellationTokenSource = new CancellationTokenSource();
+                var token = _cancellationTokenSource.Token;
+
+                try
+                {
+                    await Task.Delay(500, token);
+
+                    IsSearchPanelVisible = true;
+
+                    await PerformSearch(SearchQuery, token);
+                }
+                catch (OperationCanceledException) 
+                {
+                    IsSearchPanelVisible = false;
+                }
+            }
+        }
+
+        public async Task PerformSearch(string searchQuery, CancellationToken token)
+        {
+            var eventResults = TicketmasterService.SearchEventsAsync(searchQuery, token);
+            var venueResults = TicketmasterService.SearchVenuesAsync(searchQuery, token);
+
+            await Task.WhenAll(eventResults, venueResults);
+
+            SearchResultEvents.Clear();
+            SearchResultVenues.Clear();
+
+            foreach (var ev in eventResults.Result)
+            {
+                token.ThrowIfCancellationRequested();
+
+                SearchResultEvents.Add(ev);
+            }
+
+            foreach (var venue in venueResults.Result)
+            {
+                token.ThrowIfCancellationRequested();
+
+                SearchResultVenues.Add(venue);
+            }
+
+            SearchResultEventsIsEmpty = SearchResultEvents.Count == 0;
+            SearchResultVenuesIsEmpty = SearchResultVenues.Count == 0;
         }
 
         public async void OnScreenDetailsChanged(object sender, ScreenDetails details)

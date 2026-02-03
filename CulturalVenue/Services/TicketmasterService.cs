@@ -8,6 +8,14 @@ namespace CulturalVenue.Services
     {
         private static readonly string[] AllowedTypes = { "Arts & Theatre", "Music", "Film", "Sports" };
 
+        private static readonly Dictionary<string, ImageSource> Types = new()
+        {
+            { "Arts & Theatre", "art" },
+            { "Music", "music" },
+            { "Film", "film" },
+            { "Sports", "sports" },
+        };
+
         private static HttpClient httpClient = new()
         {
             BaseAddress = new Uri("https://app.ticketmaster.com/discovery/v2/"),
@@ -87,6 +95,118 @@ namespace CulturalVenue.Services
             catch (Exception ex)
             {
                 return new List<Venue>();
+            }
+        }
+
+        public static async Task<List<SearchResult>> SearchEventsAsync(string query, CancellationToken token)
+        {
+            var result = new List<SearchResult>();
+            
+            var url = $"events?apikey={ApiKey}&keyword={Uri.EscapeDataString(query)}&size=20";
+            
+            try
+            {
+                var response = await httpClient.GetAsync(url, token);
+                var json = await response.Content.ReadAsStringAsync(token);
+
+                using var doc = JsonDocument.Parse(json);
+
+                if (!doc.RootElement.TryGetProperty("_embedded", out var embedded)) return new List<SearchResult>();
+                var eventsArray = embedded.GetProperty("events");
+
+                foreach (var eventElement in eventsArray.EnumerateArray())
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    if (eventElement.TryGetProperty("classifications", out var classification) && classification.GetArrayLength() > 0)
+                    {
+                        var firstClass = classification[0];
+                        var segmentName = string.Empty;
+                        var subGenreName = string.Empty;
+                        var venueName = string.Empty;
+
+                        if (firstClass.TryGetProperty("segment", out var segment))
+                        {
+                            segmentName = segment.GetProperty("name").GetString();
+                            if (!Types.ContainsKey(segmentName)) continue;
+                        }
+
+                        if (firstClass.TryGetProperty("subGenre", out var subGengre))
+                        {
+                            subGenreName = subGengre.GetProperty("name").GetString();
+                        }
+
+                        if (eventElement.TryGetProperty("_embedded", out var eventEmbedded) && eventEmbedded.TryGetProperty("venues", out var venues) && venues.GetArrayLength() > 0)
+                        {
+                            venueName = venues[0].GetProperty("name").GetString();
+                        }
+
+                        var newEvent = new SearchResult
+                        {
+                            Name = eventElement.GetProperty("name").ToString(),
+                            Id = eventElement.GetProperty("id").ToString(),
+                            Type = segmentName,
+                            Icon = Types[segmentName],
+                            Description = venueName + subGenreName == string.Empty ? "" : $"{venueName} • {subGenreName}"
+                        };
+                        result.Add(newEvent);
+
+                        if (result.Count >= 3)
+                        {
+                            break;
+                        }
+                    } 
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new List<SearchResult>();
+            }
+        }
+
+        public static async Task<List<SearchResult>> SearchVenuesAsync(string query, CancellationToken token)
+        {
+            var result = new List<SearchResult>();
+
+            var url = $"venues?apikey={ApiKey}&keyword={Uri.EscapeDataString(query)}&size=3";
+
+            try
+            {
+                var response = await httpClient.GetAsync(url, token);
+                var json = await response.Content.ReadAsStringAsync(token);
+
+                using var doc = JsonDocument.Parse(json);
+
+                if (!doc.RootElement.TryGetProperty("_embedded", out var embedded)) return new List<SearchResult>();
+                var venuesArray = embedded.GetProperty("venues");
+
+                foreach (var venueElement in venuesArray.EnumerateArray())
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    var address = string.Empty;
+
+                    if (venueElement.TryGetProperty("address", out var addressName))
+                    {
+                        address = addressName.GetProperty("line1").GetString();
+                    }
+
+                    var newEvent = new SearchResult
+                    {
+                        Name = venueElement.GetProperty("name").ToString(),
+                        Id = venueElement.GetProperty("id").ToString(),
+                        Type = "Venue",
+                        Icon = ImageSource.FromFile("venue"),
+                        Description = address
+                    };
+                    result.Add(newEvent);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new List<SearchResult>();
             }
         }
     }
