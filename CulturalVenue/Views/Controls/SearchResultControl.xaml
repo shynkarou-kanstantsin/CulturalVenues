@@ -1,20 +1,39 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="CulturalVenue.Views.Controls.SearchResultControl">
-    
-    <HorizontalStackLayout>
-        <Image Source="{Binding Icon}"/>
 
-        <VerticalStackLayout>
-            <Label 
-                Text="{Binding Name}"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
-            <Label
-                Text="{Binding Description}"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
-        </VerticalStackLayout>
-    </HorizontalStackLayout>
+    <Grid VerticalOptions="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Border StrokeShape="RoundRectangle 50" HeightRequest="30" WidthRequest="30" 
+                    BackgroundColor="AntiqueWhite" Stroke="Transparent">
+                <Image Source="{Binding Icon}" VerticalOptions="Center">
+                    <Image.Behaviors>
+                        <toolkit:IconTintColorBehavior TintColor="Black"/>
+                    </Image.Behaviors>
+                </Image>
+
+            </Border>
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <VerticalStackLayout HorizontalOptions="Start" Margin="5,0,0,0">
+                <Label 
+                    Text="{Binding Name}"
+                    VerticalOptions="Center" 
+                    LineBreakMode="TailTruncation"/>
+                <Label
+                    Text="{Binding Description}"
+                    FontSize="Micro"
+                    VerticalOptions="Center"
+                    LineBreakMode="TailTruncation"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
 </ContentView>

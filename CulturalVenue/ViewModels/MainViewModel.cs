@@ -31,24 +31,18 @@ namespace CulturalVenue.ViewModels
         private string searchQuery;
 
         [ObservableProperty]
-        private bool searchResultEventsIsEmpty;
+        private bool searchResultHasEvents;
         [ObservableProperty]
-        private bool searchResultVenuesIsEmpty;
+        private bool searchResultHasVenues;
         [ObservableProperty]
-        private bool isSearchPanelVisible = false;
+        private bool isSearchPanelVisible;
+        [ObservableProperty]
+        private bool searchInProgress;
 
         public MainViewModel()
         {
             SearchResultEvents = new ObservableCollection<SearchResult>();
             SearchResultVenues = new ObservableCollection<SearchResult>();
-            SearchResultEvents.Add(new SearchResult
-            {
-                Name = "Sample Event",
-                Type = "Music",
-                Id = "E1",
-                Description = "This is a sample event description.",
-                Icon = "music"
-            });
             Venues = new ObservableCollection<Venue>();
             Events = new ObservableCollection<Event>
             {
@@ -167,6 +161,7 @@ namespace CulturalVenue.ViewModels
                     }
                 }
             };
+            IsSearchPanelVisible = false;
         }
 
         [RelayCommand]
@@ -215,73 +210,85 @@ namespace CulturalVenue.ViewModels
 
         partial void OnSearchQueryChanged(string value)
         {
-            // Мы не можем использовать await здесь, поэтому запускаем Task
-            // Использование Task.Run или просто вызов асинхронного метода
             _ = StartDelayedSearchAsync();
         }
 
         private async Task StartDelayedSearchAsync()
         {
-            if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 3)
+            if (_cancellationTokenSource is not null)
+            {
+                _cancellationTokenSource.Cancel();
+                //_cancellationTokenSource.Dispose();
+            }
+
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                IsSearchPanelVisible = false;
+                SearchResultEvents.Clear();
+                SearchResultVenues.Clear();
+                SearchResultHasEvents = false;
+                SearchResultHasVenues = false;
+                return;
+            }
+            else if (SearchQuery.Length < 3)
             {
                 SearchResultEvents.Clear();
                 SearchResultVenues.Clear();
-                SearchResultEventsIsEmpty = true;
-                SearchResultVenuesIsEmpty = true;
+                SearchResultHasEvents = false;
+                SearchResultHasVenues = false;
                 return;
             }
-            else
+
+            _cancellationTokenSource = new CancellationTokenSource();
+            var token = _cancellationTokenSource.Token;
+
+            try
             {
-                if (_cancellationTokenSource is not null)
+                SearchInProgress = true;
+
+                await Task.Delay(500, token);
+
+                var querySnapshot = SearchQuery;
+
+                var (events, venues) = await PerformSearch(querySnapshot, token);
+
+                if (token.IsCancellationRequested)
+                    return;
+
+                if (querySnapshot != SearchQuery)
+                    return;
+
+                SearchResultEvents.Clear();
+                SearchResultVenues.Clear();
+
+                foreach (var ev in events)
                 {
-                    _cancellationTokenSource.Cancel();
-                    _cancellationTokenSource.Dispose();
+                    SearchResultEvents.Add(ev);
                 }
 
-                _cancellationTokenSource = new CancellationTokenSource();
-                var token = _cancellationTokenSource.Token;
-
-                try
+                foreach (var venue in venues)
                 {
-                    await Task.Delay(500, token);
-
-                    IsSearchPanelVisible = true;
-
-                    await PerformSearch(SearchQuery, token);
+                    SearchResultVenues.Add(venue);
                 }
-                catch (OperationCanceledException) 
-                {
-                    IsSearchPanelVisible = false;
-                }
+
+                IsSearchPanelVisible = true;
+                SearchInProgress = false;
+
+                SearchResultHasEvents = SearchResultEvents.Count != 0;
+                SearchResultHasVenues = SearchResultVenues.Count != 0;
             }
+            catch (OperationCanceledException)
+            { }
         }
 
-        public async Task PerformSearch(string searchQuery, CancellationToken token)
+        public async Task<(List<SearchResult>, List<SearchResult>)> PerformSearch(string searchQuery, CancellationToken token)
         {
             var eventResults = TicketmasterService.SearchEventsAsync(searchQuery, token);
             var venueResults = TicketmasterService.SearchVenuesAsync(searchQuery, token);
 
             await Task.WhenAll(eventResults, venueResults);
 
-            SearchResultEvents.Clear();
-            SearchResultVenues.Clear();
-
-            foreach (var ev in eventResults.Result)
-            {
-                token.ThrowIfCancellationRequested();
-
-                SearchResultEvents.Add(ev);
-            }
-
-            foreach (var venue in venueResults.Result)
-            {
-                token.ThrowIfCancellationRequested();
-
-                SearchResultVenues.Add(venue);
-            }
-
-            SearchResultEventsIsEmpty = SearchResultEvents.Count == 0;
-            SearchResultVenuesIsEmpty = SearchResultVenues.Count == 0;
+            return (eventResults.Result, venueResults.Result);
         }
 
         public async void OnScreenDetailsChanged(object sender, ScreenDetails details)

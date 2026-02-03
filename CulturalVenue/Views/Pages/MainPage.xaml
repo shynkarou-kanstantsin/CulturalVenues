@@ -9,30 +9,28 @@
         <controls:MapView x:Name="Map"/>
 
         <VerticalStackLayout>
-
-            <HorizontalStackLayout HorizontalOptions="Center" Margin="0,15,0,0">
-                <ContentView>
-                    <controls:SearchBar Text="{Binding SearchQuery}"/>
-                </ContentView>
-            </HorizontalStackLayout>
-
-            <ContentView IsVisible="{Binding isSearchPanelVisible}">
-                <controls:SearchResultPannelControl/>
+            <ContentView HorizontalOptions="Center" Margin="0,15,0,0">
+                <controls:SearchBar Text="{Binding SearchQuery}"/>
             </ContentView>
-            
-            <CollectionView ItemsSource="{Binding ChipFilterList}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,7,10,0">
 
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
-                </CollectionView.ItemsLayout>
+            <Grid>
+                <CollectionView ItemsSource="{Binding ChipFilterList}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,7,10,0">
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <controls:ChipFilters/>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
+                    </CollectionView.ItemsLayout>
 
-            </CollectionView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <controls:ChipFilters/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <ContentView IsVisible="{Binding IsSearchPanelVisible}">
+                    <controls:SearchResultPannelControl/>
+                </ContentView>
+            </Grid>
 
         </VerticalStackLayout>
 

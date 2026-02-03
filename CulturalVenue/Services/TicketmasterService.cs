@@ -13,7 +13,7 @@ namespace CulturalVenue.Services
             { "Arts & Theatre", "art" },
             { "Music", "music" },
             { "Film", "film" },
-            { "Sports", "sports" },
+            { "Sports", "sport" },
         };
 
         private static HttpClient httpClient = new()
@@ -116,6 +116,13 @@ namespace CulturalVenue.Services
 
                 foreach (var eventElement in eventsArray.EnumerateArray())
                 {
+                    string name = eventElement.GetProperty("name").GetString();
+
+                    if (!name.Contains(query, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     token.ThrowIfCancellationRequested();
 
                     if (eventElement.TryGetProperty("classifications", out var classification) && classification.GetArrayLength() > 0)
@@ -124,6 +131,7 @@ namespace CulturalVenue.Services
                         var segmentName = string.Empty;
                         var subGenreName = string.Empty;
                         var venueName = string.Empty;
+                        var venueCity = string.Empty;
 
                         if (firstClass.TryGetProperty("segment", out var segment))
                         {
@@ -139,16 +147,26 @@ namespace CulturalVenue.Services
                         if (eventElement.TryGetProperty("_embedded", out var eventEmbedded) && eventEmbedded.TryGetProperty("venues", out var venues) && venues.GetArrayLength() > 0)
                         {
                             venueName = venues[0].GetProperty("name").GetString();
+
+                            if (venues[0].TryGetProperty("city", out var city))
+                            {
+                                venueCity = city.GetProperty("name").GetString();
+                            }
                         }
 
                         var newEvent = new SearchResult
                         {
-                            Name = eventElement.GetProperty("name").ToString(),
+                            Name = name,
                             Id = eventElement.GetProperty("id").ToString(),
                             Type = segmentName,
                             Icon = Types[segmentName],
-                            Description = venueName + subGenreName == string.Empty ? "" : $"{venueName} • {subGenreName}"
+                            Description = venueName + subGenreName == string.Empty ? "" : $"{venueName}, {venueCity} • {subGenreName}"
                         };
+
+                        if (result.Any(ev => ev.Name == newEvent.Name && ev.Description == newEvent.Description))
+                        {
+                            continue;
+                        }
                         result.Add(newEvent);
 
                         if (result.Count >= 3)
@@ -169,7 +187,7 @@ namespace CulturalVenue.Services
         {
             var result = new List<SearchResult>();
 
-            var url = $"venues?apikey={ApiKey}&keyword={Uri.EscapeDataString(query)}&size=3";
+            var url = $"venues?apikey={ApiKey}&keyword={Uri.EscapeDataString(query)}&size=20";
 
             try
             {
@@ -183,6 +201,8 @@ namespace CulturalVenue.Services
 
                 foreach (var venueElement in venuesArray.EnumerateArray())
                 {
+                    string name = venueElement.GetProperty("name").ToString();
+
                     token.ThrowIfCancellationRequested();
 
                     var address = string.Empty;
@@ -192,15 +212,34 @@ namespace CulturalVenue.Services
                         address = addressName.GetProperty("line1").GetString();
                     }
 
-                    var newEvent = new SearchResult
+                    if (venueElement.TryGetProperty("city", out var city))
                     {
-                        Name = venueElement.GetProperty("name").ToString(),
+                        if (address != string.Empty)
+                        {
+                            address += ", ";
+                        }
+                        address += city.GetProperty("name").GetString();
+                    }
+
+                    var newVenue = new SearchResult
+                    {
+                        Name = name,
                         Id = venueElement.GetProperty("id").ToString(),
                         Type = "Venue",
                         Icon = ImageSource.FromFile("venue"),
                         Description = address
                     };
-                    result.Add(newEvent);
+                    
+                    if (result.Any(ven => ven.Name == newVenue.Name && ven.Description == newVenue.Description))
+                    {
+                        continue;
+                    }
+                    result.Add(newVenue);
+
+                    if (result.Count >= 3)
+                    {
+                        break;
+                    }
                 }
                 return result;
             }
