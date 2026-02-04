@@ -1,8 +1,7 @@
 ﻿using CulturalVenue.Models;
 using Maui.GoogleMaps;
-using Microsoft.Maui.Dispatching;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Windows.Input;
 
 namespace CulturalVenue.Views.Controls;
 
@@ -11,6 +10,17 @@ public partial class MapView : ContentView
     private IDispatcherTimer timer;
 
     public event EventHandler<ScreenDetails> ScreenDetailsChanged;
+
+    public static readonly BindableProperty CameraChangedCommandProperty = BindableProperty.Create(
+        nameof(CameraChangedCommand),
+        typeof(ICommand),
+        typeof(MapView));
+
+    public ICommand CameraChangedCommand
+    {
+        get => (ICommand)GetValue(CameraChangedCommandProperty);
+        set => SetValue(CameraChangedCommandProperty, value);
+    }
 
     public MapView()
 	{
@@ -37,7 +47,6 @@ public partial class MapView : ContentView
         Map.BindingContext = BindingContext;
     }
 
-
     public void Map_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Map.VisibleRegion))
@@ -49,8 +58,7 @@ public partial class MapView : ContentView
 
     public void CalculateScreenDetails()
     {
-        if (Map.VisibleRegion is null)
-            return;
+        if (Map.VisibleRegion is null) return;
         
         double centerLongitude = Map.VisibleRegion.Center.Longitude;
         double centerLatitude = Map.VisibleRegion.Center.Latitude;
@@ -67,7 +75,11 @@ public partial class MapView : ContentView
             radius
         );
         
-        ScreenDetailsChanged?.Invoke(this, details);
+        if (CameraChangedCommand != null && CameraChangedCommand.CanExecute(details))
+        {
+            CameraChangedCommand.Execute(details);
+        }
+        //ScreenDetailsChanged?.Invoke(this, details);
     }
 
     protected override async void OnParentSet()

@@ -6,7 +6,7 @@
              x:Class="CulturalVenue.Views.Pages.MainPage">
 
     <Grid>
-        <controls:MapView x:Name="Map"/>
+        <controls:MapView x:Name="Map" CameraChangedCommand="{Binding UpdateMapRegionCommand}"/>
 
         <VerticalStackLayout>
             <ContentView HorizontalOptions="Center" Margin="0,15,0,0">
@@ -15,7 +15,6 @@
 
             <Grid>
                 <CollectionView ItemsSource="{Binding ChipFilterList}" VerticalOptions="Start" MaximumHeightRequest="50" Margin="10,7,10,0">
-
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15"/>
                     </CollectionView.ItemsLayout>

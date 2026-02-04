@@ -22,6 +22,7 @@ namespace CulturalVenue.ViewModels
         };
 
         private ScreenDetails _currentScreenDetails;
+        private ScreenDetails _lastScreenDetails;
 
         private CancellationTokenSource _cancellationTokenSource;
 
@@ -291,10 +292,19 @@ namespace CulturalVenue.ViewModels
             return (eventResults.Result, venueResults.Result);
         }
 
-        public async void OnScreenDetailsChanged(object sender, ScreenDetails details)
+        [RelayCommand]
+        private async Task UpdateMapRegion(ScreenDetails details)
         {
-           _currentScreenDetails = details;
-            await LoadEvents(details);
+            if (ShouldUpdateMap(details))
+            {
+                _lastScreenDetails = details;
+                await LoadEvents(details);
+            }
+        }
+
+        private bool ShouldUpdateMap(ScreenDetails details)
+        {
+            return true;    
         }
 
         private async Task LoadEvents(ScreenDetails details)

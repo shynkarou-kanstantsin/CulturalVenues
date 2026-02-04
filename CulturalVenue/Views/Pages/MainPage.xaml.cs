@@ -20,22 +20,11 @@ namespace CulturalVenue.Views.Pages
             bottomSheet.State = BottomSheetState.Collapsed;
             bottomSheet.IsOpen = true;
             bottomSheet.StateChanged += OnBottomSheetStateChanged;
-
-            if (BindingContext is MainViewModel _mainViewModel)
-            {
-                Map.ScreenDetailsChanged += _mainViewModel.OnScreenDetailsChanged;
-            }
         }
 
         protected override void OnDisappearing()
         {
             bottomSheet.StateChanged -= OnBottomSheetStateChanged;
-
-            if (BindingContext is MainViewModel _mainViewModel)
-            {
-                Map.ScreenDetailsChanged -= _mainViewModel.OnScreenDetailsChanged;
-            }
-
             base.OnDisappearing();
         }
 

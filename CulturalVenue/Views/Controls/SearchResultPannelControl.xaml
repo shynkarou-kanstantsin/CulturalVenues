@@ -19,8 +19,8 @@
 
         <Border.IsVisible>
             <MultiBinding Converter="{StaticResource AnyTrueConverter}">
-                <Binding Path="SearchResultHasEvents" />
-                <Binding Path="SearchResultHasVenues" />
+                <Binding Path="SearchResultHasEvents"/>
+                <Binding Path="SearchResultHasVenues"/>
             </MultiBinding>
         </Border.IsVisible>
         
