@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CulturalVenue.Models;
 using CulturalVenue.Services;
 using System.Collections.ObjectModel;
-
+using System.Threading.Tasks;
 
 namespace CulturalVenue.ViewModels
 {
@@ -21,13 +21,18 @@ namespace CulturalVenue.ViewModels
             new ChipFilter { Name = "Sports", ImageSource = "sport", IsSelected = false }
         };
 
+        private readonly Dictionary<string, Venue> _allCachedVenues = new();
+
         private ScreenDetails _currentScreenDetails;
         private ScreenDetails _lastScreenDetails;
 
         private CancellationTokenSource _cancellationTokenSource;
 
         public string? activeChipFilterName { get; set; } = null;
-        
+
+        private List<SearchPoint> searchPoints = new List<SearchPoint>(5);
+        private SearchPoint _lastCenterSearchPoint;
+
         [ObservableProperty]
         private string searchQuery;
 
@@ -188,7 +193,7 @@ namespace CulturalVenue.ViewModels
                 {
                     activeChipFilterName = null;
                     choosedFilter.IsSelected = false;
-                    await LoadEvents(_currentScreenDetails);
+                    //await LoadEvents(_currentScreenDetails);
                     return;
                 }
                 else
@@ -206,7 +211,7 @@ namespace CulturalVenue.ViewModels
 
             choosedFilter.IsSelected = true;
             activeChipFilterName = choosedFilter.Name;
-            await LoadEvents(_currentScreenDetails);
+            //await LoadEvents(_currentScreenDetails);
         }
 
         partial void OnSearchQueryChanged(string value)
@@ -295,28 +300,158 @@ namespace CulturalVenue.ViewModels
         [RelayCommand]
         private async Task UpdateMapRegion(ScreenDetails details)
         {
-            if (ShouldUpdateMap(details))
+            _currentScreenDetails = details;
+            
+            CalculateSearchPoints(_currentScreenDetails);
+            var currentCenter = searchPoints[0];
+
+            if (!MapMadeBigMove(currentCenter))
             {
+                await UpdateVsiblePins(details);
+            }
+            else
+            {
+                var emptyZones = GetEmptyZones();
+
+                if (emptyZones.Any())
+                {
+                    await LoadEvents(emptyZones);
+                }
+                else
+                {
+                    await UpdateVsiblePins(details);
+                }
+
                 _lastScreenDetails = details;
-                await LoadEvents(details);
+                _lastCenterSearchPoint = searchPoints[0];
             }
         }
 
-        private bool ShouldUpdateMap(ScreenDetails details)
+        private List<SearchPoint> GetEmptyZones()
         {
-            return true;    
+            List<SearchPoint> emptyZones = new List<SearchPoint>();
+
+            foreach (var point in searchPoints)
+            {
+                int venuesMinCount = 5;
+                int venuesOnMapCount = 0;
+
+                foreach (var venue in _allCachedVenues)
+                {
+                    double distance = Location.CalculateDistance(point.Latitude, point.Longitude,
+                                                                venue.Value.Latitude, venue.Value.Longitude,
+                                                                DistanceUnits.Kilometers);
+                    if (distance <= point.Radius)
+                    {
+                        venuesOnMapCount++;
+                        if (venuesOnMapCount >= venuesMinCount)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (venuesOnMapCount < venuesMinCount)
+                {
+                    emptyZones.Add(point);
+                }
+            }
+            return emptyZones;
         }
 
-        private async Task LoadEvents(ScreenDetails details)
+        private bool MapMadeBigMove(SearchPoint currentCenter)
         {
-            var results = await TicketmasterService.GetEventsByMapPosition(details, activeChipFilterName);
+            if (_lastScreenDetails == null)
+            {
+                return true;
+            }
+            
+            double distanceMoved = Location.CalculateDistance(_lastCenterSearchPoint.Latitude, _lastCenterSearchPoint.Longitude,
+                                                             currentCenter.Latitude, currentCenter.Longitude,
+                                                             DistanceUnits.Kilometers);
+
+            double moveThreshold = _lastCenterSearchPoint.Radius * 0.1;
+            double zoomThreshold = Math.Abs(_lastCenterSearchPoint.Radius- currentCenter.Radius);
+
+            return distanceMoved > moveThreshold || zoomThreshold > currentCenter.Radius * 0.1;
+        }
+
+        private void CalculateSearchPoints(ScreenDetails screenDetails)
+        {
+            searchPoints.Clear();
+
+            Location center = new Location(screenDetails.CenterLatitude, screenDetails.CenterLongitude);
+            Location edge = new Location(screenDetails.CenterLatitude, screenDetails.CenterLongitude + screenDetails.LongitudeDelta / 2);
+            
+            double radius = Location.CalculateDistance(center, edge, DistanceUnits.Kilometers);
+            double latDelta = screenDetails.LatitudeDelta / 4;
+            double lonDelta = screenDetails.LongitudeDelta / 4;
+
+            searchPoints.Add(new SearchPoint 
+                (screenDetails.CenterLatitude, screenDetails.CenterLongitude, radius));
+
+            searchPoints.Add(new SearchPoint
+                (screenDetails.CenterLatitude + latDelta, screenDetails.CenterLongitude + lonDelta, radius));
+            
+            searchPoints.Add(new SearchPoint
+                (screenDetails.CenterLatitude + latDelta, screenDetails.CenterLongitude - lonDelta, radius));
+
+            searchPoints.Add(new SearchPoint
+                (screenDetails.CenterLatitude - latDelta, screenDetails.CenterLongitude + lonDelta, radius));
+
+            searchPoints.Add(new SearchPoint
+                (screenDetails.CenterLatitude - latDelta, screenDetails.CenterLongitude - lonDelta, radius));
+        }
+
+        private async Task LoadEvents(List<SearchPoint> zones)
+        {
+            var results = await TicketmasterService.GetEventsByMapPosition(zones, activeChipFilterName);
+
+            foreach(var venue in results)
+            {
+                _allCachedVenues[venue.Id] = venue;
+            }
+
+            UpdateVsiblePins(_currentScreenDetails); 
+        }
+
+        private async Task UpdateVsiblePins(ScreenDetails details)
+        {
+            if (details == null) details = _lastScreenDetails;
+
+            const int MaxVisiblePins = 100;
+
+            var venuesToShow = await Task.Run(() =>
+            {
+                double margin = 0.1;
+                double minLat = details.CenterLatitude - (details.LatitudeDelta / 2) * (1 + margin);
+                double maxLat = details.CenterLatitude + (details.LatitudeDelta / 2) * (1 + margin);
+                double minLon = details.CenterLongitude - (details.LongitudeDelta / 2) * (1 + margin);
+                double maxLon = details.CenterLongitude + (details.LongitudeDelta / 2) * (1 + margin); 
+                
+                return _allCachedVenues.Values.Where(v => v.Latitude >= minLat && v.Latitude <= maxLat &&
+                                                            v.Longitude >= minLon && v.Longitude <= maxLon).ToList().Take(MaxVisiblePins);
+            });
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                Venues.Clear();
-                foreach (var ev in results)
+                var currentIds = Venues.Select(v => v.Id).ToHashSet();
+                var newIds = venuesToShow.Select(v => v.Id).ToHashSet();
+
+                for (int i = Venues.Count - 1; i >= 0; i--)
                 {
-                    Venues.Add(ev);
+                    if (!newIds.Contains(Venues[i].Id))
+                    {
+                        Venues.RemoveAt(i);
+                    }
+                }
+
+                foreach (var venue in venuesToShow)
+                {
+                    if (!currentIds.Contains(venue.Id))
+                    {
+                        Venues.Add(venue);
+                    }
                 }
             });
         }

@@ -1,4 +1,5 @@
 ﻿using CulturalVenue.Models;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json;
 
@@ -23,79 +24,81 @@ namespace CulturalVenue.Services
 
         private const string ApiKey = Config.TicketmasterKey;
 
-        public static async Task<List<Venue>> GetEventsByMapPosition(ScreenDetails screenDetails, string? activeChipFilterName)
+        public static async Task<List<Venue>> GetEventsByMapPosition(List<SearchPoint> zones, string? activeChipFilterName)
         {
-            var latitude = screenDetails.CenterLatitude.ToString("F6", CultureInfo.InvariantCulture);
-            var longitude = screenDetails.CenterLongitude.ToString("F6", CultureInfo.InvariantCulture);
-            var radius = Math.Max(1, (int)screenDetails.RadiusInKm);
+            var venuesDict = new ConcurrentDictionary<string, Venue>();
 
             string startDateTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
             string endDateTime = DateTime.UtcNow.AddDays(10).ToString("yyyy-MM-ddTHH:mm:ssZ");
 
             string filter = "";
-
             if (!string.IsNullOrEmpty(activeChipFilterName))
             {
                 filter = $"&segmentName={Uri.EscapeDataString(activeChipFilterName)}";
             }
 
-            var url = $"events?apikey={ApiKey}&latlong={latitude},{longitude}&radius={radius}&unit=km&startDateTime={startDateTime}&endDateTime={endDateTime}{filter}&size=40";
-
-            try
+            var tasks = zones.Select(async zone =>
             {
-                var response = await httpClient.GetAsync(url);
-                var json = await response.Content.ReadAsStringAsync();
+                var latitude = zone.Latitude.ToString("F6", CultureInfo.InvariantCulture);
+                var longitude = zone.Longitude.ToString("F6", CultureInfo.InvariantCulture);
+                var radius = Math.Max(1, (int)zone.Radius);
 
-                var venuesDict = new Dictionary<string, Venue>();
+                string url = $"events?apikey={ApiKey}&latlong={latitude},{longitude}&radius={radius}&unit=km&startDateTime={startDateTime}&endDateTime={endDateTime}{filter}&size=40";
 
-                using var doc = JsonDocument.Parse(json);
-
-                if (!doc.RootElement.TryGetProperty("_embedded", out var embedded)) return new List<Venue>();
-                var eventsArray = embedded.GetProperty("events");
-
-                foreach (var eventElement in eventsArray.EnumerateArray())
+                try
                 {
-                    if (eventElement.TryGetProperty("_embedded", out var evEmb) &&
-                        evEmb.TryGetProperty("venues", out var venuesArray))
+                    var response = await httpClient.GetAsync(url);
+                    var json = await response.Content.ReadAsStringAsync();
+
+                    using var doc = JsonDocument.Parse(json);
+
+                    if (!doc.RootElement.TryGetProperty("_embedded", out var embedded)) return;
+                    var eventsArray = embedded.GetProperty("events");
+
+                    foreach (var eventElement in eventsArray.EnumerateArray())
                     {
-                        if (!eventElement.TryGetProperty("classifications", out var classificationsArray)) continue;
-
-                        var classification = classificationsArray[0];
-                        if (!classification.TryGetProperty("segment", out var segment)) continue;
-
-                        var segmentName = segment.GetProperty("name").GetString();
-                        if (!AllowedTypes.Contains(segmentName)) continue;
-
-                        var vElement = venuesArray[0];
-                        string vId = vElement.GetProperty("id").GetString();
-
-                        if (!venuesDict.ContainsKey(vId))
+                        if (eventElement.TryGetProperty("_embedded", out var evEmb) &&
+                            evEmb.TryGetProperty("venues", out var venuesArray))
                         {
-                            if (!vElement.TryGetProperty("location", out var vLocation)) continue;
+                            if (!eventElement.TryGetProperty("classifications", out var classificationsArray)) continue;
 
-                            if (double.TryParse(vLocation.GetProperty("latitude").GetString(), CultureInfo.InvariantCulture, out double vLatitude) &&
-                                double.TryParse(vLocation.GetProperty("longitude").GetString(), CultureInfo.InvariantCulture, out double vLongitude))
+                            var classification = classificationsArray[0];
+                            if (!classification.TryGetProperty("segment", out var segment)) continue;
+
+                            var segmentName = segment.GetProperty("name").GetString();
+                            if (!AllowedTypes.Contains(segmentName)) continue;
+
+                            var vElement = venuesArray[0];
+                            string vId = vElement.GetProperty("id").GetString();
+
+                            if (!venuesDict.ContainsKey(vId))
                             {
-                                var newVenue = new Venue
+                                if (!vElement.TryGetProperty("location", out var vLocation)) continue;
+
+                                if (double.TryParse(vLocation.GetProperty("latitude").GetString(), CultureInfo.InvariantCulture, out double vLatitude) &&
+                                    double.TryParse(vLocation.GetProperty("longitude").GetString(), CultureInfo.InvariantCulture, out double vLongitude))
                                 {
-                                    Id = vId,
-                                    Name = vElement.GetProperty("name").GetString(),
-                                    Latitude = vLatitude,
-                                    Longitude = vLongitude,
-                                    Address = vElement.TryGetProperty("address", out var address) ? address.GetProperty("line1").GetString() : "",
-                                    Type = segmentName
-                                };
-                                venuesDict.Add(vId, newVenue);
+                                    var newVenue = new Venue
+                                    {
+                                        Id = vId,
+                                        Name = vElement.GetProperty("name").GetString(),
+                                        Latitude = vLatitude,
+                                        Longitude = vLongitude,
+                                        Address = vElement.TryGetProperty("address", out var address) ? address.GetProperty("line1").GetString() : "",
+                                        Type = segmentName
+                                    };
+                                    venuesDict.TryAdd(vId, newVenue);
+                                }
                             }
                         }
                     }
                 }
-                return venuesDict.Values.ToList();
-            }
-            catch (Exception ex)
-            {
-                return new List<Venue>();
-            }
+                catch { }
+            });
+
+            await Task.WhenAll(tasks);
+
+            return venuesDict.Values.ToList();
         }
 
         public static async Task<List<SearchResult>> SearchEventsAsync(string query, CancellationToken token)

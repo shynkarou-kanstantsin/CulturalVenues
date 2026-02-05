@@ -63,23 +63,17 @@ public partial class MapView : ContentView
         double centerLongitude = Map.VisibleRegion.Center.Longitude;
         double centerLatitude = Map.VisibleRegion.Center.Latitude;
         
-        Location center = new Location(centerLatitude, centerLongitude);
-
-        Location westSide = new Location(centerLatitude, centerLongitude + Map.VisibleRegion.LongitudeDegrees / 2);
-
-        double radius = Location.CalculateDistance(center, westSide, DistanceUnits.Kilometers) / 2;
-    
         var details = new Models.ScreenDetails(
             centerLatitude,
             centerLongitude,
-            radius
+            Map.VisibleRegion.LatitudeDegrees,
+            Map.VisibleRegion.LongitudeDegrees
         );
         
         if (CameraChangedCommand != null && CameraChangedCommand.CanExecute(details))
         {
             CameraChangedCommand.Execute(details);
         }
-        //ScreenDetailsChanged?.Invoke(this, details);
     }
 
     protected override async void OnParentSet()

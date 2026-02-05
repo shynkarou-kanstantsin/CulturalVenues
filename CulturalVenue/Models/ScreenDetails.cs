@@ -7,6 +7,7 @@ namespace CulturalVenue.Models
     public record ScreenDetails(
         double CenterLatitude,
         double CenterLongitude,
-        double RadiusInKm
+        double LatitudeDelta,
+        double LongitudeDelta
     );
 }
