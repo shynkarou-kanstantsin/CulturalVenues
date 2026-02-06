@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:CulturalVenue.Converters"
+             xmlns:local="clr-namespace:CulturalVenue.Views.Controls"
+             x:Class="CulturalVenue.Views.Controls.SearchBar">
+
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <converters:SearchBarCleanButtonConverter x:Key="SearchBarCleanButtonConverter" />
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <Border Background="White"  Stroke="Black" StrokeShape="RoundRectangle 20" StrokeThickness="1"
+            HeightRequest="50" WidthRequest="340">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="60*"/>
+                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="15*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Image Source="search" HeightRequest="20"/>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <ContentView>
+                    <Entry Placeholder="Search venues or events..." VerticalOptions="Center"
+                           Text="{Binding Text, Source={RelativeSource AncestorType={x:Type local:SearchBar}}, UpdateSourceEventName=TextChanged}"/>
+                </ContentView>
+            </Grid>
+
+            <Grid Grid.Column="2">
+                <ActivityIndicator IsRunning="{Binding SearchInProgress}" IsVisible="{Binding SearchInProgress}" Color="DeepSkyBlue" 
+                       HeightRequest="20" WidthRequest="20" VerticalOptions="Center" HorizontalOptions="Center"/>
+            </Grid>
+
+            <Grid Grid.Column="3">
+                <Image Source="x"  HeightRequest="20"
+                       IsVisible="{Binding Text, Source={RelativeSource AncestorType={x:Type local:SearchBar}}, Converter={StaticResource SearchBarCleanButtonConverter}}">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ClearCommand, Source={RelativeSource AncestorType={x:Type local:SearchBar}}}"/>
+                    </Image.GestureRecognizers>
+                </Image>
+            </Grid>
+
+            <Grid Grid.Column="4">
+                <Image Source="filter_list" HeightRequest="20"/>
+            </Grid>
+
+            <Grid Grid.Column="5">
+                <Border StrokeShape="RoundRectangle 35" StrokeThickness="1" Stroke="Black" 
+                        WidthRequest="35" HeightRequest="35">
+                    <Image Source="person.png"/>
+                </Border>
+            </Grid>
+            
+        </Grid>
+    </Border>
+
+</ContentView>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maps="clr-namespace:Maui.GoogleMaps;assembly=Maui.GoogleMaps"
+             xmlns:converters="clr-namespace:CulturalVenue.Converters"
+             x:Class="CulturalVenue.Views.Controls.MapView">
+
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <converters:PositionConverter x:Key="PositionConverter"/>
+            <converters:BitmapIconsConverter x:Key="BitmapIconsConverter"/>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <maps:Map x:Name="Map" MapType="Street" ItemsSource="{Binding Venues}" Padding="0,150,0,150">
+
+        <maps:Map.ItemTemplate>
+            <DataTemplate>
+                <maps:Pin Position="{Binding ., Converter={StaticResource PositionConverter}}"
+                          Label="{Binding Name}"
+                          Address="{Binding Address}"
+                          Type="{Binding Type}"
+                          Icon="{Binding Type, Converter={StaticResource BitmapIconsConverter}}"/>
+            </DataTemplate>
+        </maps:Map.ItemTemplate>
+    </maps:Map>
+
+</ContentView>

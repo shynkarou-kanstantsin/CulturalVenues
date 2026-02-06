@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:CulturalVenue.Views.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="CulturalVenue.Views.Controls.SearchResultPannelControl">
+
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <toolkit:VariableMultiValueConverter x:Key="AllTrueConverter" ConditionType="All"/>
+            <toolkit:VariableMultiValueConverter x:Key="AnyTrueConverter" ConditionType="Any"/>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <Border Background="White" StrokeShape="RoundRectangle 20" Padding="10" WidthRequest="340">
+        <Border.Shadow>
+            <Shadow Brush="Black" Offset="0,10" Radius="20" Opacity="0.2"/>
+        </Border.Shadow>
+
+        <Border.IsVisible>
+            <MultiBinding Converter="{StaticResource AnyTrueConverter}">
+                <Binding Path="SearchResultHasEvents"/>
+                <Binding Path="SearchResultHasVenues"/>
+            </MultiBinding>
+        </Border.IsVisible>
+        
+        <VerticalStackLayout>
+            <Label 
+                Text="Events"
+                TextColor="Silver"
+                VerticalOptions="Center" 
+                HorizontalOptions="Start"
+                IsVisible="{Binding SearchResultHasEvents}"
+                Margin="10,5,0,5"/>
+
+            <CollectionView ItemsSource="{Binding SearchResultEvents}" Margin="0,0,0,10">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="15"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <controls:SearchResultControl/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <BoxView HeightRequest="1" Color="Grey" Margin="10">
+                <BoxView.IsVisible>
+                    <MultiBinding Converter="{StaticResource AllTrueConverter}">
+                        <Binding Path="SearchResultHasEvents" />
+                        <Binding Path="SearchResultHasVenues" />
+                    </MultiBinding>
+                </BoxView.IsVisible>
+            </BoxView>
+
+            <Label 
+                Text="Venues"
+                TextColor="Silver"
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" 
+                IsVisible="{Binding SearchResultHasVenues}"
+                Margin="10,0,0,5"/>
+
+            <CollectionView ItemsSource="{Binding SearchResultVenues}" Margin="0,0,0,10">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="15"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <controls:SearchResultControl/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </Border>
+</ContentView>
