@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using CulturalVenue.Models;
 using CulturalVenue.Services;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace CulturalVenue.ViewModels
 {
@@ -13,12 +12,13 @@ namespace CulturalVenue.ViewModels
         public ObservableCollection<Venue> Venues { get; set; } 
         public ObservableCollection<SearchResult> SearchResultEvents { get; set; }
         public ObservableCollection<SearchResult> SearchResultVenues { get; set; }
-        public ObservableCollection<ChipFilter> ChipFilterList { get; } = new()
+
+        public List<ChipFilter> ChipFilterList { get; } = new()
         {
-            new ChipFilter { Name = "Arts & Theatre", ImageSource = "art", IsSelected = false },
-            new ChipFilter { Name = "Music", ImageSource = "music", IsSelected = false },
-            new ChipFilter { Name = "Film", ImageSource = "film", IsSelected = false },
-            new ChipFilter { Name = "Sports", ImageSource = "sport", IsSelected = false }
+            new ChipFilter { Name = "Arts & Theatre", ImageSource = "art" },
+            new ChipFilter { Name = "Music", ImageSource = "music" },
+            new ChipFilter { Name = "Film", ImageSource = "film" },
+            new ChipFilter { Name = "Sports", ImageSource = "sport" }
         };
 
         private readonly Dictionary<string, Venue> _allCachedVenues = new();
@@ -26,16 +26,14 @@ namespace CulturalVenue.ViewModels
         private ScreenDetails _currentScreenDetails;
         private ScreenDetails _lastScreenDetails;
 
-        private CancellationTokenSource _cancellationTokenSource;
-
-        public string? activeChipFilterName { get; set; } = null;
+        private CancellationTokenSource _searchCancellationTokenSource;
+        private CancellationTokenSource _pinsCancellationTokenSource;
 
         private List<SearchPoint> searchPoints = new List<SearchPoint>(5);
         private SearchPoint _lastCenterSearchPoint;
 
         [ObservableProperty]
         private string searchQuery;
-
         [ObservableProperty]
         private bool searchResultHasEvents;
         [ObservableProperty]
@@ -44,6 +42,8 @@ namespace CulturalVenue.ViewModels
         private bool isSearchPanelVisible;
         [ObservableProperty]
         private bool searchInProgress;
+        [ObservableProperty]
+        private string? activeChipFilterName = null;
 
         public MainViewModel()
         {
@@ -187,31 +187,17 @@ namespace CulturalVenue.ViewModels
         [RelayCommand]
         public async void FilterChipsChanged(ChipFilter choosedFilter)
         {
-            if (!String.IsNullOrEmpty(activeChipFilterName))
+            if (choosedFilter.Name == ActiveChipFilterName)
             {
-                if (activeChipFilterName == choosedFilter.Name)
-                {
-                    activeChipFilterName = null;
-                    choosedFilter.IsSelected = false;
-                    //await LoadEvents(_currentScreenDetails);
-                    return;
-                }
-                else
-                {
-                    foreach (var chip in ChipFilterList)
-                    {
-                        if (chip.Name == activeChipFilterName)
-                        {
-                            chip.IsSelected = false;
-                            break;
-                        }
-                    }
-                }
+                ActiveChipFilterName = null;
+            }
+            else
+            {
+                ActiveChipFilterName = choosedFilter.Name;
             }
 
-            choosedFilter.IsSelected = true;
-            activeChipFilterName = choosedFilter.Name;
-            //await LoadEvents(_currentScreenDetails);
+            Venues.Clear();
+            await UpdateMapRegion(_currentScreenDetails, true);
         }
 
         partial void OnSearchQueryChanged(string value)
@@ -221,9 +207,9 @@ namespace CulturalVenue.ViewModels
 
         private async Task StartDelayedSearchAsync()
         {
-            if (_cancellationTokenSource is not null)
+            if (_searchCancellationTokenSource is not null)
             {
-                _cancellationTokenSource.Cancel();
+                _searchCancellationTokenSource.Cancel();
                 //_cancellationTokenSource.Dispose();
             }
 
@@ -245,8 +231,8 @@ namespace CulturalVenue.ViewModels
                 return;
             }
 
-            _cancellationTokenSource = new CancellationTokenSource();
-            var token = _cancellationTokenSource.Token;
+            _searchCancellationTokenSource = new CancellationTokenSource();
+            var token = _searchCancellationTokenSource.Token;
 
             try
             {
@@ -298,32 +284,47 @@ namespace CulturalVenue.ViewModels
         }
 
         [RelayCommand]
-        private async Task UpdateMapRegion(ScreenDetails details)
+        private async Task MapRegionChanged(ScreenDetails details)
+        {
+            _pinsCancellationTokenSource?.Cancel();
+            _pinsCancellationTokenSource = new CancellationTokenSource();
+            var token = _pinsCancellationTokenSource.Token;
+
+            try
+            {
+                await Task.Delay(300, token);
+                await UpdateMapRegion(details, false);
+            }
+            catch (OperationCanceledException) 
+            { }
+        }
+        
+        private async Task UpdateMapRegion(ScreenDetails details, bool forceRefresh, CancellationToken token=default)
         {
             _currentScreenDetails = details;
             
             CalculateSearchPoints(_currentScreenDetails);
             var currentCenter = searchPoints[0];
 
-            if (!MapMadeBigMove(currentCenter))
-            {
-                await UpdateVsiblePins(details);
-            }
-            else
+            if (MapMadeBigMove(currentCenter) || forceRefresh == true)
             {
                 var emptyZones = GetEmptyZones();
 
                 if (emptyZones.Any())
                 {
-                    await LoadEvents(emptyZones);
+                    await LoadEvents(emptyZones, token);
                 }
                 else
                 {
-                    await UpdateVsiblePins(details);
+                    await UpdateVisiblePins(details, token);
                 }
 
                 _lastScreenDetails = details;
                 _lastCenterSearchPoint = searchPoints[0];
+            }
+            else
+            {
+                await UpdateVisiblePins(details);
             }
         }
 
@@ -338,6 +339,11 @@ namespace CulturalVenue.ViewModels
 
                 foreach (var venue in _allCachedVenues)
                 {
+                    if (!string.IsNullOrEmpty(ActiveChipFilterName) && venue.Value.Type != ActiveChipFilterName)
+                    {
+                        continue;
+                    }
+
                     double distance = Location.CalculateDistance(point.Latitude, point.Longitude,
                                                                 venue.Value.Latitude, venue.Value.Longitude,
                                                                 DistanceUnits.Kilometers);
@@ -403,26 +409,29 @@ namespace CulturalVenue.ViewModels
                 (screenDetails.CenterLatitude - latDelta, screenDetails.CenterLongitude - lonDelta, radius));
         }
 
-        private async Task LoadEvents(List<SearchPoint> zones)
+        private async Task LoadEvents(List<SearchPoint> zones, CancellationToken token)
         {
-            var results = await TicketmasterService.GetEventsByMapPosition(zones, activeChipFilterName);
+            var results = await TicketmasterService.GetEventsByMapPosition(zones, ActiveChipFilterName, token);
 
             foreach(var venue in results)
             {
+                token.ThrowIfCancellationRequested();
                 _allCachedVenues[venue.Id] = venue;
             }
 
-            UpdateVsiblePins(_currentScreenDetails); 
+            UpdateVisiblePins(_currentScreenDetails, token); 
         }
 
-        private async Task UpdateVsiblePins(ScreenDetails details)
+        private async Task UpdateVisiblePins(ScreenDetails details, CancellationToken token=default)
         {
             if (details == null) details = _lastScreenDetails;
 
-            const int MaxVisiblePins = 100;
+            const int MaxVisiblePins = 50;
 
             var venuesToShow = await Task.Run(() =>
             {
+                token.ThrowIfCancellationRequested();
+                
                 double margin = 0.1;
                 double minLat = details.CenterLatitude - (details.LatitudeDelta / 2) * (1 + margin);
                 double maxLat = details.CenterLatitude + (details.LatitudeDelta / 2) * (1 + margin);
@@ -430,13 +439,21 @@ namespace CulturalVenue.ViewModels
                 double maxLon = details.CenterLongitude + (details.LongitudeDelta / 2) * (1 + margin); 
                 
                 return _allCachedVenues.Values.Where(v => v.Latitude >= minLat && v.Latitude <= maxLat &&
-                                                            v.Longitude >= minLon && v.Longitude <= maxLon).ToList().Take(MaxVisiblePins);
+                                                            v.Longitude >= minLon && v.Longitude <= maxLon &&
+                                                            (string.IsNullOrEmpty(ActiveChipFilterName) || v.Type == ActiveChipFilterName)).Take(MaxVisiblePins).ToList();
             });
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
+                if (token.IsCancellationRequested) return;
+                
                 var currentIds = Venues.Select(v => v.Id).ToHashSet();
                 var newIds = venuesToShow.Select(v => v.Id).ToHashSet();
+
+                if (newIds.SetEquals(currentIds))
+                {
+                    return;
+                }
 
                 for (int i = Venues.Count - 1; i >= 0; i--)
                 {

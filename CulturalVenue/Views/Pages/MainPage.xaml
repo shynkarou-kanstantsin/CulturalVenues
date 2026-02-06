@@ -6,7 +6,7 @@
              x:Class="CulturalVenue.Views.Pages.MainPage">
 
     <Grid>
-        <controls:MapView x:Name="Map" CameraChangedCommand="{Binding UpdateMapRegionCommand}"/>
+        <controls:MapView x:Name="Map" CameraChangedCommand="{Binding MapRegionChangedCommand}"/>
 
         <VerticalStackLayout>
             <ContentView HorizontalOptions="Center" Margin="0,15,0,0">

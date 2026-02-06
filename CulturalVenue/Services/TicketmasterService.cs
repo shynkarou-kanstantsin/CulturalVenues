@@ -24,7 +24,7 @@ namespace CulturalVenue.Services
 
         private const string ApiKey = Config.TicketmasterKey;
 
-        public static async Task<List<Venue>> GetEventsByMapPosition(List<SearchPoint> zones, string? activeChipFilterName)
+        public static async Task<List<Venue>> GetEventsByMapPosition(List<SearchPoint> zones, string? activeChipFilterName, CancellationToken token)
         {
             var venuesDict = new ConcurrentDictionary<string, Venue>();
 
@@ -47,8 +47,8 @@ namespace CulturalVenue.Services
 
                 try
                 {
-                    var response = await httpClient.GetAsync(url);
-                    var json = await response.Content.ReadAsStringAsync();
+                    var response = await httpClient.GetAsync(url, token);
+                    var json = await response.Content.ReadAsStringAsync(token);
 
                     using var doc = JsonDocument.Parse(json);
 
